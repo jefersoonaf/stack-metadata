@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block content %}
+    {% for description in descriptions %}
+        <h4>{{ description.question_id }} - {{ description.title | safe }}</h4>
+        <ul class="border-bottom border-top">
+            <p>{{ description.body | safe }}</p>
+        </ul>
+    {% endfor %}
+{% endblock content %}
