@@ -1,40 +1,4 @@
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Page</title>
-    <style>
-        pre {
-            background: #f4f4f4;
-            border: 1px solid #ddd;
-            border-left: 3px solid #f36d33;
-            color: rgb(70, 70, 70);
-            page-break-inside: avoid;
-            font-family: monospace;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 1.6em;
-            max-width: 100%;
-            overflow: auto;
-            padding: 1em 1.5em;
-            display: block;
-            word-wrap: break-word;
-        }
-    </style>
-</head>
-
-<body>
-    <p>What is the use of the <code>yield</code> keyword in Python, and what does it do?</p><br><p>For example, I'm
-        trying to understand this code<sup><strong>1</strong></sup>:</p><br>
-    <pre><code>def _get_child_candidates(self, distance, min_dist, max_dist):<br>    if self._leftchild and distance - max_dist &lt; self._median:<br>        yield self._leftchild<br>    if self._rightchild and distance + max_dist &gt;= self._median:<br>        yield self._rightchild  <br></code></pre>
-    <br><p>And this is the caller:</p><br>
-    <pre><code>result, candidates = [], [self]<br>while candidates:<br>    node = candidates.pop()<br>    distance = node._get_dist(obj)<br>    if distance &lt;= max_dist and distance &gt;= min_dist:<br>        result.extend(node._values)<br>    candidates.extend(node._get_child_candidates(distance, min_dist, max_dist))<br>return result<br></code></pre>
-    <br><p>What happens when the method <code>_get_child_candidates</code> is called?<br>Is a list returned? A single
-        element? Is it called again? When will subsequent calls stop?</p><br>
-    <hr><br><p><sub><br>1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for
-            metric spaces. This is the link to the complete source: </sub></p><br>
-</body>
-
-</html>
+{% extends 'layout.html' %}
+{% block content %}
+    <h4>About Page</h4>
+{% endblock content %}
