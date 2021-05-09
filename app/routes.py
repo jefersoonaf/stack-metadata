@@ -56,23 +56,44 @@ def index():
 def about():
     return render_template("about.html")
 
-@app.route("/sites")
-def sites():
+#### sites ####
+
+@app.route("/search_sites/", methods=['GET'])
+def search_sites():
+    stackexchange = StackExchange()
+    pages_sites = stackexchange.sites()
+    for page in pages_sites:
+        for site in page["items"]:
+            print(site)
+            try:
+                site_object = Site(site)
+                database.create("sites", site_object)
+            except:
+                continue
+    return pages_sites
+
+@app.route("/view_sites/", methods=['GET'])
+def view_sites():
+    sites = database.list("sites")
+    lista = []
+    for site in sites:
+        lista.append(site["site"])
+    return render_template("data.html", sites=lista)
+
+@app.route("/table", methods=['GET'])
+def table():
+    return render_template("data.html")
+
+@app.route("/test/", methods=['GET'])
+def test():
     stackexchange = StackExchange()
     sites = stackexchange.sites()
+ 
     for site in sites["items"]:
+        
         try:
             site_object = Site(site)
             database.create("sites", site_object)
         except:
             continue
     return sites
-
-@app.route("/list_sites")
-def list_sites():
-    sites = database.list("sites")
-    lista = []
-    for site in sites:
-        lista.append(site["site"]["name"])
-    print(lista)
-    return lista[1]
