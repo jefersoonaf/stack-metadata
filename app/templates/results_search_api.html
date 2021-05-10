@@ -15,12 +15,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>DataTables</h1>
+          <h1>Sites</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">DataTables</li>
+            <li class="breadcrumb-item active">Sites</li>
           </ol>
         </div>
       </div>
@@ -34,7 +34,10 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">DataTable with default features</h3>
+              <h3 class="card-title">Sites diponíveis para consulta</h3>
+              <a style="float: right;" class="col-md-1 btn btn-primary" href="{{ url_for('search_sites') }}">
+                <i class="fas fa-sync-alt btn-primary"></i>
+              </a>
             </div>
             <!-- /.card-header -->
             {% if sites %}
@@ -43,6 +46,7 @@
                   <thead>
                   <tr>
                     <th>Nome</th>
+                    <th>Parametro API</th>
                     <th>URL</th>
                     <th>Nicho</th>
                   </tr>
@@ -51,7 +55,8 @@
                     {% for site in sites %}
                       <tr>
                         <td>{{ site['name'] }}</td>
-                        <td><a href="{{ site['url'] }}">{{ site['url'] }}</a></td>
+                        <td>{{ site['api_parameter'] }}</td>
+                        <td><a href="{{ site['url'] }}" target="_blank">{{ site['url'] }}</a></td>
                         <td>{{ site['audience'] }}</td>
                       </tr>
                     {% endfor %}
@@ -59,6 +64,7 @@
                   <tfoot>
                   <tr>
                     <th>Nome</th>
+                    <th>Parametro API</th>
                     <th>URL</th>
                     <th>Nicho</th>
                   </tr>

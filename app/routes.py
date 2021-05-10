@@ -1,7 +1,7 @@
 #import flask app
 from app import app 
 #import dos metodos do flask
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template, url_for, redirect
 #import do objeto do banco de dados
 from app import database
 #import das coleções do banco de dados
@@ -50,50 +50,64 @@ def home():
 
 @app.route("/index/")
 def index():
-    return render_template("index.html")
+    number_sites = len(database.list("sites"))
+    return render_template("index.html", number_sites=number_sites)
 
-@app.route("/about/")
-def about():
-    return render_template("about.html")
 
 #### sites ####
 
 @app.route("/search_sites/", methods=['GET'])
 def search_sites():
+    sites_database = database.list("sites")
+    """list_sites_database = []
+    for site in sites_database:
+        list_sites_database.append(site["site"]["api_parameter"])"""
     stackexchange = StackExchange()
     pages_sites = stackexchange.sites()
-    for page in pages_sites:
-        for site in page["items"]:
-            print(site)
-            try:
+    if sites_database:
+        for page in pages_sites:
+            for site in page["items"]:
                 site_object = Site(site)
-                database.create("sites", site_object)
-            except:
-                continue
-    return pages_sites
+                site_json = site_object.get_as_json()
+                for site_database in sites_database:
+                    if site_json["site"]["api_parameter"] == site_database["site"]["api_parameter"]:
+                        site_update = {**site_database, **site_json}
+                        break
+                if site_update != None or "":
+                    database.update("sites", site_update)
+                    break
+                else:
+                    database.create("sites", site_object)
+                    break
+    else:
+        for page in pages_sites:
+            for site in page["items"]:
+                try:
+                    site_object = Site(site)
+                    database.create("sites", site_object)
+                except:
+                    continue
+    return redirect(url_for('view_sites'))
 
 @app.route("/view_sites/", methods=['GET'])
 def view_sites():
     sites = database.list("sites")
-    lista = []
+    list_sites = []
     for site in sites:
-        lista.append(site["site"])
-    return render_template("data.html", sites=lista)
+        list_sites.append(site["site"])
+    return render_template("view_sites.html", sites=list_sites)
 
-@app.route("/table", methods=['GET'])
-def table():
-    return render_template("data.html")
+
+#### learning_object ####
+
+@app.route("/search_api/")
+def search_api():
+    return render_template("search_api.html")
+
+
+#### test ####
 
 @app.route("/test/", methods=['GET'])
 def test():
-    stackexchange = StackExchange()
-    sites = stackexchange.sites()
- 
-    for site in sites["items"]:
-        
-        try:
-            site_object = Site(site)
-            database.create("sites", site_object)
-        except:
-            continue
-    return sites
+    return render_template("enhanced.html")
+
