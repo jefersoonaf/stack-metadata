@@ -54,7 +54,7 @@
                   <tbody>
                     {% for site in sites %}
                       <tr>
-                        <td>{{ site['name'] }}</td>
+                        <td>{{ site['name'] | safe}}</td>
                         <td>{{ site['api_parameter'] }}</td>
                         <td><a href="{{ site['url'] }}" target="_blank">{{ site['url'] }}</a></td>
                         <td>{{ site['audience'] }}</td>

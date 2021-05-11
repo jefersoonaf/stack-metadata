@@ -2,16 +2,19 @@ from flask import Flask, request
 from pymongo import MongoClient
 
 class LearningObject():
-    def __init__(self):
+    def __init__(self, learning_object_item):
         self.General = {
             "Identifier": None,
             "Title": None,
             "Catalog_Entry":{
                 "Catalogue": None,
                 "Entry": None
-                },
+            },
             "Language": None,
-            "Description": None,
+            "Description":{
+                "question": None,
+                "answer": None   
+            },
             "Keywords": None,
             "Coverage": None,
             "Structure": None,

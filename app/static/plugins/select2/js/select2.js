@@ -1759,7 +1759,7 @@ S2.define('select2/selection/multiple',[
 
   MultipleSelection.prototype.selectionContainer = function () {
     var $container = $(
-      '<li class="select2-selection__choice">' +
+      '<li class="option-selected" class="select2-selection__choice">' +
         '<span class="select2-selection__choice__remove" role="presentation">' +
           '&times;' +
         '</span>' +

@@ -44,10 +44,6 @@ descriptions = [
 ]
 
 @app.route("/")
-@app.route("/home/")
-def home(): 
-    return render_template("home.html", descriptions=descriptions)
-
 @app.route("/index/")
 def index():
     number_sites = len(database.list("sites"))
@@ -62,7 +58,7 @@ def search_sites():
     """list_sites_database = []
     for site in sites_database:
         list_sites_database.append(site["site"]["api_parameter"])"""
-    stackexchange = StackExchange()
+    stackexchange = StackExchange(100, None)
     pages_sites = stackexchange.sites()
     if sites_database:
         for page in pages_sites:
@@ -100,9 +96,36 @@ def view_sites():
 
 #### learning_object ####
 
-@app.route("/search_api/")
+@app.route("/results_search_api/", methods=['POST'])
+def results_search_api():
+    search = request.form.get('search')
+    stackexchange = StackExchange(1, 1)
+    
+    sites = database.list("sites")
+    list_sites = []
+    list_results = []
+    select = request.form.getlist('multi-select')
+    if select:
+        for option in select:
+            option = option.split("-")[1]
+            print(option)
+            for site in sites:
+                if option == site["site"]["api_parameter"]:
+                    list_sites.append(site["site"]["api_parameter"])
+                    break
+    for api_parameter in list_sites:
+        result = stackexchange.search(str(search), str(api_parameter))
+        list_results.append(result)
+    
+    return list_results[1][0]
+
+@app.route("/search_api/", methods=['GET'])
 def search_api():
-    return render_template("search_api.html")
+    sites = database.list("sites")
+    list_sites = []
+    for site in sites:
+        list_sites.append(site["site"])
+    return render_template("search_api.html", sites=list_sites)
 
 
 #### test ####
@@ -110,4 +133,3 @@ def search_api():
 @app.route("/test/", methods=['GET'])
 def test():
     return render_template("enhanced.html")
-

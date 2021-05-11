@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Sites {% endblock title %}
+{% block title %} StackMetadata | Search API {% endblock title %}
 {% block head %}
   {{ super() }}
     <!-- Google Font: Source Sans Pro -->
@@ -18,18 +18,20 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            <h2 class="text-center display-4">Enhanced Search</h2>
-            <form action="enhanced-results.html">
+            <h2 class="text-center display-4">Search API</h2>
+            <form action="{{ url_for('results_search_api') }}" method="post">
                 <div class="row">
                     <div class="col-md-10 offset-md-1">
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Result Type:</label>
-                                    <select class="select2" multiple="multiple" data-placeholder="Any" style="width: 100%;">
-                                        <option>Text only</option>
-                                        <option>Images</option>
-                                        <option>Video</option>
+                                    <label>Sites para a busca:</label>
+                                    <select name="multi-select" class="select2" multiple="multiple" data-placeholder="Nenhum" style="width: 100%;">
+                                    {% if sites %}
+                                        {% for site in sites %}
+                                            <option>{{ site['name'] | safe}}-{{ site['api_parameter'] }}</option>
+                                        {% endfor %}
+                                    {% endif %}
                                     </select>
                                 </div>
                             </div>
@@ -54,7 +56,7 @@
                         </div>
                         <div class="form-group">
                             <div class="input-group input-group-lg">
-                                <input type="search" class="form-control form-control-lg" placeholder="Type your keywords here" value="Lorem ipsum">
+                                <input name="search" type="search" class="form-control form-control-lg" placeholder="Digite o que está procurando aqui">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-lg btn-default">
                                         <i class="fa fa-search"></i>
