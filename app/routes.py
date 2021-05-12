@@ -7,41 +7,20 @@ from app import database
 #import das coleções do banco de dados
 from app.models.learning_object import LearningObject
 from app.models.site import Site
+from app.models.user import User
+#import dos formulários
+from app.models.forms import LoginForm, RegisterForm, ProfileForm
+#import do contralador de seção do usuário e verificação de senha
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import check_password_hash
 #import do controller da api do stackexchange
 from app.controllers.api_stackexchange import StackExchange
 #outros imports
 import json
 
+#### ROTAS DA APLICAÇÃO ####
 
-
-descriptions = [
-    {
-        "is_answered": True,
-        "view_count": 2490067,
-        "accepted_answer_id": 231855,
-        "answer_count": 38,
-        "score": 11066,
-        "creation_date": 1224800471,
-        "question_id": 231767,
-        "body_markdown": "What is the use of the `yield` keyword in Python, and what does it do?\r\n\r\nFor example, I&#39;m trying to understand this code&lt;sup&gt;**1**&lt;/sup&gt;:\r\n\r\n    def _get_child_candidates(self, distance, min_dist, max_dist):\r\n        if self._leftchild and distance - max_dist &lt; self._median:\r\n            yield self._leftchild\r\n        if self._rightchild and distance + max_dist &gt;= self._median:\r\n            yield self._rightchild\t\r\n\r\nAnd this is the caller:\r\n\r\n    result, candidates = [], [self]\r\n    while candidates:\r\n        node = candidates.pop()\r\n        distance = node._get_dist(obj)\r\n        if distance &lt;= max_dist and distance &gt;= min_dist:\r\n            result.extend(node._values)\r\n        candidates.extend(node._get_child_candidates(distance, min_dist, max_dist))\r\n    return result\r\n\r\nWhat happens when the method `_get_child_candidates` is called?\r\nIs a list returned? A single element? Is it called again? When will subsequent calls stop?\r\n\r\n\r\n----------\r\n\r\n\r\n&lt;sub&gt;\r\n1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for metric spaces. This is the link to the complete source: [Module mspace][1].&lt;/sub&gt;\r\n\r\n\r\n  [1]: http://well-adjusted.de/~jrschulz/mspace/",
-        "link": "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do",
-        "title": "What does the &quot;yield&quot; keyword do?",
-        "body": "<p>What is the use of the <code>yield</code> keyword in Python, and what does it do?</p>\n\n<p>For example, I'm trying to understand this code<sup><strong>1</strong></sup>:</p>\n\n<pre><code>def _get_child_candidates(self, distance, min_dist, max_dist):\n    if self._leftchild and distance - max_dist &lt; self._median:\n        yield self._leftchild\n    if self._rightchild and distance + max_dist &gt;= self._median:\n        yield self._rightchild  \n</code></pre>\n\n<p>And this is the caller:</p>\n\n<pre><code>result, candidates = [], [self]\nwhile candidates:\n    node = candidates.pop()\n    distance = node._get_dist(obj)\n    if distance &lt;= max_dist and distance &gt;= min_dist:\n        result.extend(node._values)\n    candidates.extend(node._get_child_candidates(distance, min_dist, max_dist))\nreturn result\n</code></pre>\n\n<p>What happens when the method <code>_get_child_candidates</code> is called?\nIs a list returned? A single element? Is it called again? When will subsequent calls stop?</p>\n\n<hr>\n\n<p><sub>\n1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for metric spaces. This is the link to the complete source: <a href=\"http://well-adjusted.de/~jrschulz/mspace/\" rel=\"noreferrer\">Module mspace</a>.</sub></p>\n"
-    },
-    {
-        "is_answered": True,
-        "view_count": 2490067,
-        "accepted_answer_id": 231855,
-        "answer_count": 38,
-        "score": 11066,
-        "creation_date": 1224800471,
-        "question_id": 231767,
-        "body_markdown": "What is the use of the `yield` keyword in Python, and what does it do?\r\n\r\nFor example, I&#39;m trying to understand this code&lt;sup&gt;**1**&lt;/sup&gt;:\r\n\r\n    def _get_child_candidates(self, distance, min_dist, max_dist):\r\n        if self._leftchild and distance - max_dist &lt; self._median:\r\n            yield self._leftchild\r\n        if self._rightchild and distance + max_dist &gt;= self._median:\r\n            yield self._rightchild\t\r\n\r\nAnd this is the caller:\r\n\r\n    result, candidates = [], [self]\r\n    while candidates:\r\n        node = candidates.pop()\r\n        distance = node._get_dist(obj)\r\n        if distance &lt;= max_dist and distance &gt;= min_dist:\r\n            result.extend(node._values)\r\n        candidates.extend(node._get_child_candidates(distance, min_dist, max_dist))\r\n    return result\r\n\r\nWhat happens when the method `_get_child_candidates` is called?\r\nIs a list returned? A single element? Is it called again? When will subsequent calls stop?\r\n\r\n\r\n----------\r\n\r\n\r\n&lt;sub&gt;\r\n1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for metric spaces. This is the link to the complete source: [Module mspace][1].&lt;/sub&gt;\r\n\r\n\r\n  [1]: http://well-adjusted.de/~jrschulz/mspace/",
-        "link": "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do",
-        "title": "What does the &quot;yield&quot; keyword do?",
-        "body": "<p>What is the use of the <code>yield</code> keyword in Python, and what does it do?</p>\n\n<p>For example, I'm trying to understand this code<sup><strong>1</strong></sup>:</p>\n\n<pre><code>def _get_child_candidates(self, distance, min_dist, max_dist):\n    if self._leftchild and distance - max_dist &lt; self._median:\n        yield self._leftchild\n    if self._rightchild and distance + max_dist &gt;= self._median:\n        yield self._rightchild  \n</code></pre>\n\n<p>And this is the caller:</p>\n\n<pre><code>result, candidates = [], [self]\nwhile candidates:\n    node = candidates.pop()\n    distance = node._get_dist(obj)\n    if distance &lt;= max_dist and distance &gt;= min_dist:\n        result.extend(node._values)\n    candidates.extend(node._get_child_candidates(distance, min_dist, max_dist))\nreturn result\n</code></pre>\n\n<p>What happens when the method <code>_get_child_candidates</code> is called?\nIs a list returned? A single element? Is it called again? When will subsequent calls stop?</p>\n\n<hr>\n\n<p><sub>\n1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for metric spaces. This is the link to the complete source: <a href=\"http://well-adjusted.de/~jrschulz/mspace/\" rel=\"noreferrer\">Module mspace</a>.</sub></p>\n"
-    }
-]
+#### home ####
 
 @app.route("/")
 @app.route("/index/")
@@ -49,15 +28,11 @@ def index():
     number_sites = len(database.list("sites"))
     return render_template("index.html", number_sites=number_sites)
 
-
 #### sites ####
 
 @app.route("/search_sites/", methods=['GET'])
 def search_sites():
     sites_database = database.list("sites")
-    """list_sites_database = []
-    for site in sites_database:
-        list_sites_database.append(site["site"]["api_parameter"])"""
     stackexchange = StackExchange(100, None)
     pages_sites = stackexchange.sites()
     if sites_database:
@@ -106,7 +81,7 @@ def results_search_api():
     list_results = []
     select = request.form.getlist('multi-select')
     if select:
-        for option in select:
+        for option in select:                                       ### criar ium objeto learning object, passar ele para uma variavel e em seguida colocar na lista para mandar para o html
             option = option.split("-")[1]
             print(option)
             for site in sites:
@@ -126,6 +101,128 @@ def search_api():
     for site in sites:
         list_sites.append(site["site"])
     return render_template("search_api.html", sites=list_sites)
+
+#### Login, Registro, Perfil e Logout ####
+
+#Login
+@app.route("/login/", methods=['GET', 'POST'])
+def login():
+    if not current_user.is_authenticated:
+        error = None
+        form = LoginForm()
+        if form.validate_on_submit():
+            email = form.email.data
+            password = form.password.data
+            query = database.filter_by('users', {"email": email})
+            if query:
+                user_bd = query[0]
+                is_pass_ok = check_password_hash(user_bd['password'], password)
+                if is_pass_ok:
+                    user = User(user_bd['name'], user_bd['email'], user_bd['password'])
+                    login_user(user)
+                    print(user.email)
+                    return redirect(url_for("index"))
+                else:
+                    error = 1
+            else:
+                error = 1
+        else:
+            print("Não Validade")
+        return render_template('login.html', form=form, error=error)
+    else:
+        return redirect(url_for("index"))
+
+#Logout
+@app.route("/logout/", methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+#Profile
+@app.route("/profile/", methods=['GET', 'POST'])
+def profile():
+    form = ProfileForm()
+    error = None
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        current_password = form.current_password.data
+        new_password = form.new_password.data
+        repeat_new_password = form.repeat_new_password.data
+        # Saber se email é o mesmo
+        query = database.filter_by('users', {"email": email})
+        if query:
+            user_bd = query[0]
+            is_email_used = True
+            is_email_same = (user_bd['email'] == current_user.email)
+        else:
+            is_email_used = False
+            is_email_same = False
+        if not is_email_used or is_email_same:
+            #verificar se a senha atual é igual
+            user_bd = database.filter_by('users', {"email": current_user.email})
+            user_bd = user_bd[0]
+            is_pass_ok = check_password_hash(user_bd['password'], current_password)
+            if is_pass_ok:
+                if new_password == repeat_new_password:
+                    user_bd['name'] = name
+                    user_bd['password'] = new_password
+                    user_bd['email'] = email
+
+                    
+                    database.update("users", user_bd)
+                    return redirect(url_for("index"))
+                else:
+                    error = 3 # Nova Senha Não coincide
+            else:
+                error = 2 #Senha atual está errada
+        else:
+            error = 1 #Email está em uso e não é o mesmo
+    else:
+        form.name.data = current_user.name
+        form.email.data = current_user.email
+        print(form.errors)
+    
+    return render_template('profile.html', form=form, error=error)
+    
+#Criar Conta
+@app.route("/register/", methods=['GET', 'POST'])
+def register():
+    if not current_user.is_authenticated:
+        error = None
+        form = RegisterForm()
+        if form.validate_on_submit():
+            name = form.name.data
+            email = form.email.data
+            password = form.password.data
+            password2 = form.repeat_password.data
+            query = database.filter_by('users', {"email": email})
+            if not query:
+                if password == password2:
+                    user = User(name, email, password)
+                    database.create("users", user)
+                    login_user(user)
+                    return redirect(url_for("index"))
+                else:
+                    error = 2 #Senhas são diferentes
+            else:
+                error = 1 #Email já cadastrado
+        else:
+            print(form.errors)
+
+        return render_template('register.html', form=form, error=error)
+    else:
+        return redirect(url_for("index"))
+    
+#### tratamento de exceções nas rotas ####
+
+@app.errorhandler(404)
+def errorPage(e):
+    return render_template('404.html')
+    
+@app.errorhandler(401)
+def page_not_found(e):
+    return redirect(url_for("login"))
 
 
 #### test ####
