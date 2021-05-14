@@ -1,7 +1,7 @@
 #import flask app
 from app import app 
 #import dos metodos do flask
-from flask import Flask, request, render_template, url_for, redirect
+from flask import Flask, request, render_template, url_for, redirect, flash
 #import do objeto do banco de dados
 from app import database
 #import das coleções do banco de dados
@@ -24,6 +24,7 @@ import json
 
 @app.route("/")
 @app.route("/index/")
+@login_required
 def index():
     number_sites = len(database.list("sites"))
     return render_template("index.html", number_sites=number_sites)
@@ -31,6 +32,7 @@ def index():
 #### sites ####
 
 @app.route("/search_sites/", methods=['GET'])
+@login_required
 def search_sites():
     sites_database = database.list("sites")
     stackexchange = StackExchange(100, None)
@@ -61,6 +63,7 @@ def search_sites():
     return redirect(url_for('view_sites'))
 
 @app.route("/view_sites/", methods=['GET'])
+@login_required
 def view_sites():
     sites = database.list("sites")
     list_sites = []
@@ -72,6 +75,7 @@ def view_sites():
 #### learning_object ####
 
 @app.route("/results_search_api/", methods=['POST'])
+@login_required
 def results_search_api():
     search = request.form.get('search')
     stackexchange = StackExchange(1, 1)
@@ -95,6 +99,7 @@ def results_search_api():
     return list_results[1][0]
 
 @app.route("/search_api/", methods=['GET'])
+@login_required
 def search_api():
     sites = database.list("sites")
     list_sites = []
@@ -104,42 +109,61 @@ def search_api():
 
 #### Login, Registro, Perfil e Logout ####
 
+#Criar Conta
+@app.route("/register/", methods=['GET', 'POST'])
+def register():
+    if not current_user.is_authenticated:
+        form = RegisterForm()
+        if form.validate_on_submit():
+            name = form.name.data
+            email = form.email.data
+            password = form.password.data
+            query = database.filter_by('users', {"email": email})
+            if not query:
+                user = User(name, email, password)
+                database.create("users", user)
+                flash('Conta registrada com sucesso!', 'success')
+                return redirect(url_for("login"))
+            else:
+                flash('Email já cadastrado', 'danger')
+        return render_template('register.html', form=form)
+    else:
+        return redirect(url_for("index"))
+
 #Login
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
     if not current_user.is_authenticated:
-        error = None
         form = LoginForm()
         if form.validate_on_submit():
             email = form.email.data
             password = form.password.data
+            remember = form.remember.data
+            print(remember)
             query = database.filter_by('users', {"email": email})
             if query:
                 user_bd = query[0]
-                is_pass_ok = check_password_hash(user_bd['password'], password)
-                if is_pass_ok:
+                if check_password_hash(user_bd['password'], password):
                     user = User(user_bd['name'], user_bd['email'], user_bd['password'])
-                    login_user(user)
-                    print(user.email)
+                    login_user(user, remember=remember)
+                    flash('Login realizado com sucesso!', 'success')
                     return redirect(url_for("index"))
                 else:
-                    error = 1
-            else:
-                error = 1
-        else:
-            print("Não Validade")
-        return render_template('login.html', form=form, error=error)
+                    flash('Problema com o login. Por favor verifique seu email e senha.', 'danger')
+        return render_template('login.html', form=form)
     else:
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
 #Logout
 @app.route("/logout/", methods=['GET', 'POST'])
+@login_required
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
 #Profile
 @app.route("/profile/", methods=['GET', 'POST'])
+@login_required
 def profile():
     form = ProfileForm()
     error = None
@@ -185,35 +209,6 @@ def profile():
     
     return render_template('profile.html', form=form, error=error)
     
-#Criar Conta
-@app.route("/register/", methods=['GET', 'POST'])
-def register():
-    if not current_user.is_authenticated:
-        error = None
-        form = RegisterForm()
-        if form.validate_on_submit():
-            name = form.name.data
-            email = form.email.data
-            password = form.password.data
-            password2 = form.repeat_password.data
-            query = database.filter_by('users', {"email": email})
-            if not query:
-                if password == password2:
-                    user = User(name, email, password)
-                    database.create("users", user)
-                    login_user(user)
-                    return redirect(url_for("index"))
-                else:
-                    error = 2 #Senhas são diferentes
-            else:
-                error = 1 #Email já cadastrado
-        else:
-            print(form.errors)
-
-        return render_template('register.html', form=form, error=error)
-    else:
-        return redirect(url_for("index"))
-    
 #### tratamento de exceções nas rotas ####
 
 @app.errorhandler(404)
@@ -224,9 +219,13 @@ def errorPage(e):
 def page_not_found(e):
     return redirect(url_for("login"))
 
+@app.errorhandler(500)
+def errorPage(e):
+    return render_template('500.html')
+
 
 #### test ####
 
 @app.route("/test/", methods=['GET'])
 def test():
-    return render_template("enhanced.html")
+    return render_template("500.html")

@@ -14,74 +14,98 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
 </head>
-<body class="hold-transition login-page">
-<div class="login-box">
-  <!-- /.login-logo -->
-  <div class="card card-outline card-primary">
-    <div class="card-header text-center">
-      <h1><b>StackMetadata</b></h1>
-    </div>
-    <div class="card-body">
-      <p class="login-box-msg">Faça login para iniciar sua seção</p>
-
-      <form action="{{ url_for('index') }}" method="post">
-        <div class="input-group mb-3">
-          {{form.email(class="form-control form-control-user", placeholder="Coloque seu endereço de e-mail...")}}
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>
-          <!--<input type="email" class="form-control" placeholder="Email">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>-->
+<body class="hold-transition register-page">
+  <div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <h5>Alerta!</h5>
+          {{ message }}
         </div>
-        <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Senha">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="remember">
-              <label for="remember">
-                Lembre-se de mim
-              </label>
-            </div>
-          </div>
-          <!-- /.col -->
-          <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-          </div>
-          <!-- /.col -->
-        </div>
-      </form>
-
-      <p class="mb-1">
-        <a href="forgot-password.html">Esqueci minha senha</a>
-      </p>
-      <p class="mb-0">
-        <a href="{{ url_for('register') }}" class="text-center">Registre-se</a>
-      </p>
-    </div>
-    <!-- /.card-body -->
+      {% endfor %}
+      {% endif %}
+    {% endwith %}
   </div>
-  <!-- /.card -->
-</div>
-<!-- /.login-box -->
+  <div class="register-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline card-primary">
+      <div class="card-header text-center">
+        <h1><b>StackMetadata</b></h1>
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg">Faça login para iniciar sua seção</p>
 
-<!-- jQuery -->
-<script src="{{ url_for('static', filename='plugins/jquery/jquery.min.js') }}"></script>
-<!-- Bootstrap 4 -->
-<script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- AdminLTE App -->
-<script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
+        <form action="" method="post">
+          {{ form.hidden_tag() }}
+          <div class="input-group mb-3">
+            {% if form.email.errors %}
+              {{ form.email(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{form.email(class="form-control", placeholder="Email")}}
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fas fa-envelope"></span>
+                  </div>
+                </div>
+            {% endif %}
+          </div>
+          <div class="input-group mb-3">
+            {% if form.password.errors %}
+              {{ form.password(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{form.password(class="form-control", placeholder="Senha")}}
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                {{ form.remember(class="form-check-input") }}
+                {{ form.remember.label(class="form-check-label") }}
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              {{ form.submit(class="btn btn-primary btn-block") }}
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+
+        <p class="mb-1">
+          <a href="forgot-password.html">Esqueci minha senha</a>
+        </p>
+        <p class="mb-0">
+          <a href="{{ url_for('register') }}" class="text-center">Registre-se</a>
+        </p>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  <!-- /.login-box -->
+
+  <!-- jQuery -->
+  <script src="{{ url_for('static', filename='plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
 </body>
 </html>

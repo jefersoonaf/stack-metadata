@@ -2,104 +2,107 @@ from flask import Flask, request
 from pymongo import MongoClient
 
 class LearningObject():
-    def __init__(self, learning_object_item):
-        self.General = {
-            "Identifier": None,
-            "Title": None,
-            "Catalog_Entry":{
-                "Catalogue": None,
-                "Entry": None
+    def __init__(self, learning_object_item, name_site):
+        self.general = {
+            "identifier": learning_object_item["question_id"],
+            "title": learning_object_item["title"],
+            "catalog_entry":{
+                "catalogue": learning_object_item["tags"],
+                "entry": learning_object_item["link"]
             },
-            "Language": None,
-            "Description":{
-                "question": None,
-                "answer": None   
+            "language": None,
+            "description":{
+                "question": learning_object_item["body"],
+                "answers": learning_object_item["answers"]  
             },
-            "Keywords": None,
-            "Coverage": None,
-            "Structure": None,
-            "Aggregation_Level": None
+            "keywords": None,
+            "coverage": None,
+            "structure": ["linear", "Hireárquico"],
+            "aggregation_level": "2"
         }
-        self.Life_Cycle = {
-            "Version": None,
-            "Status": None,
-            "Contribute":{
-                "Role": None,
-                "Entity": None,
-                "Date": None
+        self.life_cycle = {
+            "version": None,
+            "status": "Revisado",
+            "contribute":{
+                "role": "Autor",
+                "entity": str(learning_object_item["owner"]["user_id"]+"-"+learning_object_item["owner"]["display_name"]),
+                "date": learning_object_item["creation_date"]
             }
         }
-        self.Meta_metadata = {
-            "Identifier": None,
-            "Catalog":{
-                "Catalog": None,
-                "Entry": None
+        self.meta_metadata = {
+            "identifier": learning_object_item["question_id"],
+            "catalog":{
+                "catalog": learning_object_item["tags"],
+                "entry": None
             },
-            "Contribute":{
-                "Role": None,
-                "Entity": None,
-                "Date": None
+            "contribute":{
+                "role": "Autor",
+                "entity": str(learning_object_item["owner"]["user_id"]+"-"+learning_object_item["owner"]["display_name"]),
+                "date": learning_object_item["creation_date"]
             },
-            "Metadata_Scheme": "IEEE LOM",
-            "Language": None
+            "metadata_scheme": "IEEE LOM",
+            "language": None
         }
-        self.Technical = {
-            "Format": None,
-            "Size": None,
-            "Location": None,
-            "Requirements":{
-                "Type": None,
-                "Name": None,
-                "Min_version": None,
-                "Max_version": None
+        self.technical = {
+            "format": "text/html",
+            "size": None,
+            "location": learning_object_item["link"],
+            "requirements":{
+                "type": "Operating System",
+                "name": "Linux",
+                "min_version": None,
+                "max_version": None
             },
-            "Installation_Remarks": None,
-            "Other_platform_requirements": None,
-            "Duration": None
+            "installation_remarks": None,
+            "other_platform_requirements": None,
+            "duration": None
         }
-        self.Educational = {
-            "Interactivity_Type": "Expositivo",
-            "Learning_Resource_Type": "Texto Narrativo",
-            "Interactivity_Level": "Baixo",
-            "Semantic_Density": "Médio",
-            "Intended_end_user_role": "Professor",
-            "Context": None,
-            "Typical_Age_Range": None,
-            "Difficulty": None,
-            "Typical_learning_Time": None,
-            "Description": None,
-            "Language": None
+        self.educational = {
+            "interactivity_type": "Expositivo",
+            "learning_resource_type": "Texto Narrativo",
+            "interactivity_level": "Baixo",
+            "semantic_density": "Médio",
+            "intended_end_user_role": "Professor",
+            "context": "Todos",
+            "typical_age_range": "12+",
+            "difficulty": "Fácil",
+            "typical_learning_time": None,
+            "description": None,
+            "language": None
         }
-        self.Rights = {
-            "Cost": None,
-            "Copyright_&_other_restrictions": None,
-            "Description": None
+        self.rights = {
+            "cost": None,
+            "copyright_&_other_restrictions": None,
+            "description": None
         }
-        self.Relation = {
-            "Kind": None,
-            "Resource":{
-                "Identifier": None,
-                "Description": None,
-                "Catalog_entry": None
+        self.relation = {
+            "kind": None,
+            "resource":{
+                "identifier": None,
+                "description": None,
+                "catalog_entry": None
             }
         }
-        self.Annotation = {
-            "Person": None,
-            "Date": None,
-            "Description": None
+        self.annotation = {
+            "person": None,
+            "date": None,
+            "description": None
         }
-        self.Classification = {
-            "Purpose": None,
-            "Taxon_path":{
-                "Source": None,
-                "Taxon":{
-                    "ID": "Objetivo Educacional",
-                    "Entry": None
+        self.classification = {
+            "purpose": None,
+            "taxon_path":{
+                "source": None,
+                "taxon":{
+                    "id": "Objetivo Educacional",
+                    "entry": learning_object_item["link"]
                 }
             },
-            "Description": None,
-            "Keywords": None
+            "description":{
+                "question": learning_object_item["body"],
+                "answers": learning_object_item["answers"],
+            "keywords": learning_object_item["tags"]
         }
+    }
 
     def get_as_json(self):
         return self.__dict__

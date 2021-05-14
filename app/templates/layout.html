@@ -38,7 +38,7 @@
       <li class="nav-item dropdown user-menu">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
           <img src="{{ url_for('static', filename='dist/img/user2-160x160.jpg') }}" class="user-image img-circle elevation-2" alt="User Image">
-          <span class="d-none d-md-inline">Alexander Pierce</span>
+          <span class="d-none d-md-inline">{{ current_user.name }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <!-- User image -->
@@ -46,14 +46,13 @@
             <img src="{{ url_for('static', filename='dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
 
             <p>
-              Alexander Pierce - Web Developer
-              <small>Member since Nov. 2012</small>
+              {{ current_user.name }}
             </p>
           </li>
           <!-- Menu Footer-->
           <li class="user-footer">
             <a href="#" class="btn btn-default btn-flat">Profile</a>
-            <a href="#" class="btn btn-default btn-flat float-right">Sign out</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-default btn-flat float-right">Logout</a>
           </li>
         </ul>
       </li>
@@ -143,7 +142,7 @@
     <div class="float-right d-none d-sm-block">
       <b>Version</b> 1.0.0
     </div>
-    <strong>Copyright &copy; 2021 <a href="#">StackMetadata</a>.</strong> All rights reserved.
+    <strong>Copyright &copy; 2021 <a href="#">StackMetadata</a>.</strong> Todos os direitos reservados.
   </footer>
 
   <!-- Control Sidebar -->
