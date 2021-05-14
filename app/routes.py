@@ -93,10 +93,14 @@ def results_search_api():
                     list_sites.append(site["site"]["api_parameter"])
                     break
     for api_parameter in list_sites:
-        result = stackexchange.search(str(search), str(api_parameter))
-        list_results.append(result)
+        list_result_items = stackexchange.search_advanced(str(search), str(api_parameter))
+        list_results.append(list_result_items)
     
-    return list_results[1][0]
+    for resutado_site in list_results:
+        for resultado in resutado_site:
+            print(resultado["title"])
+    
+    return render_template("results_search_api.html", list_results=list_results)
 
 @app.route("/search_api/", methods=['GET'])
 @login_required

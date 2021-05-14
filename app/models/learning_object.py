@@ -15,7 +15,7 @@ class LearningObject():
                 "question": learning_object_item["body"],
                 "answers": learning_object_item["answers"]  
             },
-            "keywords": None,
+            "keywords": learning_object_item["tags"],
             "coverage": None,
             "structure": ["linear", "Hireárquico"],
             "aggregation_level": "2"
@@ -71,9 +71,9 @@ class LearningObject():
             "language": None
         }
         self.rights = {
-            "cost": None,
-            "copyright_&_other_restrictions": None,
-            "description": None
+            "cost": "Não",
+            "copyright_&_other_restrictions": "Não",
+            "description": "Acesso Público"
         }
         self.relation = {
             "kind": None,
@@ -89,11 +89,11 @@ class LearningObject():
             "description": None
         }
         self.classification = {
-            "purpose": None,
+            "purpose": "Objetivo Educacional",
             "taxon_path":{
-                "source": None,
+                "source": name_site,
                 "taxon":{
-                    "id": "Objetivo Educacional",
+                    "id": "url",
                     "entry": learning_object_item["link"]
                 }
             },
