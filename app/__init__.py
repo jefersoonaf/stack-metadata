@@ -12,10 +12,9 @@ database = Database("meta_v1")
 #FLASK_APP=run.py
 app = Flask('app') 
 app.config.update(
-    SECRET_KEY = SECRET_KEY
+    SECRET_KEY = SECRET_KEY,
+    DEBUG=True
 )
-
-#app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
