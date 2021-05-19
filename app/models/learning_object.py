@@ -2,9 +2,9 @@ from flask import Flask, request
 from pymongo import MongoClient
 
 class LearningObject():
-    def __init__(self, learning_object_item, name_site):
+    def __init__(self, learning_object_item, name_site, api_site):
         self.general = {
-            "identifier": learning_object_item["question_id"],
+            "identifier": [str(api_site), learning_object_item["question_id"]],
             "title": learning_object_item["title"],
             "catalog_entry":{
                 "catalogue": learning_object_item["tags"],
@@ -25,7 +25,7 @@ class LearningObject():
             "status": "Revisado",
             "contribute":{
                 "role": "Autor",
-                "entity": str(learning_object_item["owner"]["user_id"]+"-"+learning_object_item["owner"]["display_name"]),
+                "entity": "{}-{}".format(str(learning_object_item["owner"]["user_id"]), str(learning_object_item["owner"]["display_name"])),
                 "date": learning_object_item["creation_date"]
             }
         }
@@ -37,7 +37,7 @@ class LearningObject():
             },
             "contribute":{
                 "role": "Autor",
-                "entity": str(learning_object_item["owner"]["user_id"]+"-"+learning_object_item["owner"]["display_name"]),
+                "entity": "{}-{}".format(str(learning_object_item["owner"]["user_id"]), str(learning_object_item["owner"]["display_name"])),
                 "date": learning_object_item["creation_date"]
             },
             "metadata_scheme": "IEEE LOM",

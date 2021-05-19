@@ -18,6 +18,10 @@ from app.controllers.api_stackexchange import StackExchange
 #outros imports
 import json
 
+
+list_sites = []
+list_results = []
+
 #### ROTAS DA APLICAÇÃO ####
 
 #### home ####
@@ -26,8 +30,16 @@ import json
 @app.route("/index/")
 @login_required
 def index():
-    number_sites = len(database.list("sites"))
-    return render_template("index.html", number_sites=number_sites)
+    try:
+        number_sites = len(database.list("sites"))
+    except:
+        number_sites = 0
+        
+    try:
+        number_learning_objects = len(database.list("learning_objects"))
+    except:
+        number_learning_objects = 0
+    return render_template("index.html", number_sites=number_sites, number_learning_objects=number_learning_objects)
 
 #### sites ####
 
@@ -74,14 +86,25 @@ def view_sites():
 
 #### learning_object ####
 
+@app.route("/search_api/", methods=['GET'])
+@login_required
+def search_api():
+    sites = database.list("sites")
+    global list_sites
+    list_sites = []
+    for site in sites:
+        list_sites.append(site["site"])
+    return render_template("search_api.html", sites=list_sites)
+
 @app.route("/results_search_api/", methods=['POST'])
 @login_required
 def results_search_api():
     search = request.form.get('search')
-    stackexchange = StackExchange(1, 1)
+    stackexchange = StackExchange(2, 1)
     
     sites = database.list("sites")
-    list_sites = []
+    list_sites_api = []
+    global list_results
     list_results = []
     select = request.form.getlist('multi-select')
     if select:
@@ -90,26 +113,43 @@ def results_search_api():
             print(option)
             for site in sites:
                 if option == site["site"]["api_parameter"]:
-                    list_sites.append(site["site"]["api_parameter"])
+                    list_sites_api.append(site["site"]["api_parameter"])
                     break
-    for api_parameter in list_sites:
+    for api_parameter in list_sites_api:
         list_result_items = stackexchange.search_advanced(str(search), str(api_parameter))
         list_results.append(list_result_items)
     
-    for resutado_site in list_results:
-        for resultado in resutado_site:
-            print(resultado["title"])
-    
     return render_template("results_search_api.html", list_results=list_results)
 
-@app.route("/search_api/", methods=['GET'])
+@app.route("/save_search/<int:index_list_results>/<int:index_result>/")
 @login_required
-def search_api():
+def save_search(index_list_results, index_result):
+    global list_sites
+    global list_results
+    name_site = list_sites[int(index_list_results)]["name"]
+    api_site = list_sites[index_list_results]["api_parameter"]
+    save_item = list_results[index_list_results][index_result]
+    learning_object = (LearningObject(save_item, name_site, api_site))
+    database.create("learning_objects", learning_object)
+    return render_template("results_search_api.html", list_results=list_results)
+
+@app.route("/search_database/")
+def search_database():
     sites = database.list("sites")
-    list_sites = []
+    global list_sites
     for site in sites:
         list_sites.append(site["site"])
-    return render_template("search_api.html", sites=list_sites)
+    return render_template("search_database.html", sites=list_sites)
+
+@app.route("/results_search_database/")
+def results_search_database():
+    
+    pass
+
+@app.route("/view_learning_objects/")
+def view_learning_objects():
+    
+    pass
 
 #### Login, Registro, Perfil e Logout ####
 
@@ -232,4 +272,4 @@ def errorPage(e):
 
 @app.route("/test/", methods=['GET'])
 def test():
-    return render_template("500.html")
+    return render_template("profile.html")

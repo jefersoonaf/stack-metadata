@@ -29,7 +29,7 @@
                                     <select name="multi-select" class="select2" multiple="multiple" data-placeholder="Nenhum" style="width: 100%;">
                                     {% if sites %}
                                         {% for site in sites %}
-                                            <option>{{ site['name'] | safe}}-{{ site['api_parameter'] }}</option>
+                                            <option>{{ site['name'] | safe }}-{{ site['api_parameter'] }}</option>
                                         {% endfor %}
                                     {% endif %}
                                     </select>

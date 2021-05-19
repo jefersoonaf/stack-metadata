@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Results Search API {% endblock title %}
+{% block title %} StackMetadata | Results Search Database {% endblock title %}
 {% block head %}
   {{ super() }}
   <!-- DataTables -->
@@ -15,12 +15,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Results Search API</h1>
+          <h1>Results Search Database</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Results Search API</li>
+            <li class="breadcrumb-item active">Results Search Database</li>
           </ol>
         </div>
       </div>
@@ -43,7 +43,6 @@
                   <thead>
                   <tr>
                     <th>Ação</th>
-                    <th>Index</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
@@ -51,19 +50,16 @@
                   </thead>
                   <tbody>
                     {% for result_for_site in list_results %}
-                      {% set index_list_results = loop.index-1 %}
                       {% for result in result_for_site %}
-                        {% set index_result = loop.index-1 %}
                         <tr>
                           <td>
-                            <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result) }}" class="btn btn-secondary btn-icon-split">
+                            <a href="{{ url_for('save_search/') }}" class="btn btn-secondary btn-icon-split">
                               <span class="icon text-white-50">
-                                  <i class="fas fa-plus"></i>
+                                  <i class="fas fa-arrow-right"></i>
                               </span>
-                              <span class="text">Adicionar</span>
+                              <span class="text">Visualizar</span>
                             </a>
                           </td>
-                          <td>{{ save_search }}/{{ index_list_results }}/{{ index_result }}/</td>
                           <td>{{ result['title'] | safe }}</td>
                           <td>{{ result['tags'] | safe }}</td>
                           <td><a href="{{ result['link'] }}" target="_blank">{{ result['link'] }}</a></td>
@@ -74,7 +70,6 @@
                   <tfoot>
                   <tr>
                     <th>Ação</th>
-                    <th>Index</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>

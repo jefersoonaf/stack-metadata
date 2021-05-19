@@ -29,20 +29,22 @@ class StackExchange():
         return all_page_items
     
     def search_advanced(self, title_parameter, site_parameter):
-        self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!)E0fBjq-AsnarVKlARBxRcJDFDX8j60oDmcDl3M9iAJhKYBIq")
+        """self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!)E0fBjq-AsnarVKlARBxRcJDFDX8j60oDmcDl3M9iAJhKYBIq")"""
+        self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!SBpEoG7Z8a5aJlA_l*BbIj*_*YTAdFUkcd4Q53dk_K7tBfHZCox5iskb.DMw4chD")
         print(self.current_url)
         response = requests.get(self.current_url)
         page_items = response.json()
         all_page_items = []
-        for item in page_items["items"]:
-            all_page_items.append(item)
-        while page_items["has_more"] == True and self.page < self.max_pages: #loop para pegar todos os itens da resposta, serve para respostam que tem mais de uma pagina
-            self.page += 1
-            current_url = self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!)E0fBjq-AsnarVKlARBxRcJDFDX8j60oDmcDl3M9iAJhKYBIq")
-            response = requests.get(self.current_url)
-            page_items = response.json()
+        if page_items:
             for item in page_items["items"]:
                 all_page_items.append(item)
+            while page_items["has_more"] == True and self.page < self.max_pages: #loop para pegar todos os itens da resposta, serve para respostam que tem mais de uma pagina
+                self.page += 1
+                self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!SBpEoG7Z8a5aJlA_l*BbIj*_*YTAdFUkcd4Q53dk_K7tBfHZCox5iskb.DMw4chD")
+                response = requests.get(self.current_url)
+                page_items = response.json()
+                for item in page_items["items"]:
+                    all_page_items.append(item)
         return all_page_items#pegar o resto da divisão por 100
 
     def question(self):
