@@ -3,6 +3,17 @@
 ## Versão do Python
 Foi utilizado o Python3.9, logo aconselha-se a utilização da mesma versão.
 
+## Criando as configurações
+Dentro da pasta app, crie um arquivo **.env**, de modo que se tenha a seguinte estrutura:
+```
+|--app/
+    |--.env
+```
+E dentro desse arquivo **.env**, deve-se colocar uma **SECRET_KEY** da seguinte forma:
+```
+SECRET_KEY = 'sua chave secreta aqui'
+#pode ser qualquer string, mas é desejável uma com alto fator de criptografia
+```
 ## Instalando e executando o ambiente virtual
 ```
 python3.9 -m pip install virtualenv
