@@ -1,7 +1,7 @@
 # Preparações para o uso da aplicação
 
 ## Versão do Python
-Foi utilizado o Python3.9, logo aconselha-se a utilização da mesma.
+Foi utilizado o Python3.9, logo aconselha-se a utilização da mesma versão.
 
 ## Instalando e executando o ambiente virtual
 ```
