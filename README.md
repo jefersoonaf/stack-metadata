@@ -9,10 +9,15 @@ Dentro da pasta app, crie um arquivo **.env**, de modo que se tenha a seguinte e
 |--app/
     |--.env
 ```
-E dentro desse arquivo **.env**, deve-se colocar uma **SECRET_KEY** da seguinte forma:
+E dentro desse arquivo **.env**, deve-se colocar uma **SECRET_KEY** que será usada pelo flask app da seguinte forma:
 ```
 SECRET_KEY = 'sua chave secreta aqui'
 #pode ser qualquer string, mas é desejável uma com alto fator de criptografia
+```
+
+Também deve conter a Key fornecida pela API do StackExchange da seguinte forma:
+```
+API_KEY = 'sua chave da API aqui'
 ```
 ## Instalando e executando o ambiente virtual
 ```

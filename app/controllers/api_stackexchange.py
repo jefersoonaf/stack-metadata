@@ -1,9 +1,13 @@
 import requests
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 class StackExchange():
     def __init__(self, page_size, max_pages):
         self.url_base = "https://api.stackexchange.com/2.2/"
-        self.key = "&key=4rU2hllG6ydwRrC23RuHjA(("
+        self.key = f"&key={API_KEY}"
         self.page = 1
         self.page_size = page_size
         self.max_pages = max_pages if max_pages != None else 100000
