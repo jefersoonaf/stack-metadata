@@ -25,18 +25,32 @@
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-6 col-6">
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
                 <h3>{{ number_sites }}</h3>
 
-                <p>Sites API</p>
+                <p>Sites</p>
               </div>
               <div class="icon">
-                <i class="ion ion-link"></i>
+                <i class="fas fa-link"></i>
               </div>
-              <a href="{{ url_for('view_sites') }}" class="small-box-footer">Mais Informações<i class="fas fa-arrow-circle-right"></i></a>
+              <a href="{{ url_for('view_sites') }}" class="small-box-footer">Mais Informações <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{ number_learning_objects }}</h3>
+
+                <p>Objetos de Aprendizagem</p>
+              </div>
+              <div class="icon">
+                <i class="fab fa-stack-overflow"></i>
+              </div>
+              <a href="{{ url_for('view_learning_objects') }}" class="small-box-footer">Mais Informações <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
       </div>

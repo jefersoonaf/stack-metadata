@@ -125,11 +125,11 @@ def results_search_api():
 @login_required
 def save_search(index_list_results, index_result):
     global list_sites
-    global list_results
+    global list_results #verificar se já esta no banco de dados e impedir de incluir novamente
     name_site = list_sites[int(index_list_results)]["name"]
     api_site = list_sites[index_list_results]["api_parameter"]
     save_item = list_results[index_list_results][index_result]
-    learning_object = (LearningObject(save_item, name_site, api_site))
+    learning_object = LearningObject(save_item, name_site, api_site)
     database.create("learning_objects", learning_object)
     return render_template("results_search_api.html", list_results=list_results)
 
@@ -148,8 +148,11 @@ def results_search_database():
 
 @app.route("/view_learning_objects/")
 def view_learning_objects():
-    
-    pass
+    learning_objects = database.list("learning_objects")
+    list_learning_objects = []
+    for learning_object in learning_objects:
+        list_learning_objects.append(learning_object)
+    return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
 #### Login, Registro, Perfil e Logout ####
 
