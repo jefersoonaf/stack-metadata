@@ -146,6 +146,7 @@ def results_search_database():
     
     pass
 
+@login_required
 @app.route("/view_learning_objects/")
 def view_learning_objects():
     learning_objects = database.list("learning_objects")
@@ -153,6 +154,11 @@ def view_learning_objects():
     for learning_object in learning_objects:
         list_learning_objects.append(learning_object)
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
+
+@login_required
+@app.route("/view_learning_object/")
+def view_learning_object():
+    return render_template("view_learning_object.html")
 
 #### Login, Registro, Perfil e Logout ####
 

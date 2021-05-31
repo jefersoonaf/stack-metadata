@@ -42,6 +42,7 @@
                 <table id="data-table" class="table table-bordered table-striped">
                   <thead>
                   <tr>
+                    <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
@@ -50,6 +51,14 @@
                   <tbody>
                     {% for learning_object in learning_objects %}
                       <tr>
+                        <td>
+                          <a href="{{ url_for('view_learning_object') }}" class="btn btn-secondary btn-icon-split">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                            <span class="text">Visualizar</span>
+                          </a>
+                        </td>
                         <td>{{ learning_object['general']['title'] }}</td>
                         <td>{{ learning_object['general']['catalog_entry']['catalogue'] }}</td>
                         <td><a href="{{ learning_object['general']['catalog_entry']['entry'] }}" target="_blank">{{ learning_object['general']['catalog_entry']['entry'] }}</a></td>
@@ -58,6 +67,7 @@
                   </tbody>
                   <tfoot>
                   <tr>
+                    <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
