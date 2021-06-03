@@ -19,9 +19,8 @@ from app.controllers.api_stackexchange import StackExchange
 import json
 
 
-list_sites = []
-list_results = []
-
+#list_sites = []
+cache_app = []
 #### ROTAS DA APLICAÇÃO ####
 
 #### home ####
@@ -90,7 +89,7 @@ def view_sites():
 @login_required
 def search_api():
     sites = database.list("sites")
-    global list_sites
+    #global list_sites
     list_sites = []
     for site in sites:
         list_sites.append(site["site"])
@@ -104,7 +103,7 @@ def results_search_api():
     
     sites = database.list("sites")
     list_sites_api = []
-    global list_results
+    global cache_app
     list_results = []
     select = request.form.getlist('multi-select')
     if select:
@@ -113,30 +112,57 @@ def results_search_api():
             print(option)
             for site in sites:
                 if option == site["site"]["api_parameter"]:
-                    list_sites_api.append(site["site"]["api_parameter"])
+                    list_sites_api.append(site["site"])
                     break
     for api_parameter in list_sites_api:
-        list_result_items = stackexchange.search_advanced(str(search), str(api_parameter))
+        list_result_items = stackexchange.search_advanced(str(search), str(api_parameter["api_parameter"]))
         list_results.append(list_result_items)
     
-    return render_template("results_search_api.html", list_results=list_results)
+    cache_user = []
+    for x in range(len(cache_app)):
+        print(current_user.email == cache_app[x][0])
+        if current_user.email == cache_app[x][0]:              
+            cache_user = cache_app[x]
+            break        
+    if cache_user:
+        cache_user[1] = list_results
+        cache_user[2] = list_sites_api
+    else:
+        cache_user.append(current_user.email)
+        cache_user.append(list_results)
+        cache_user.append(list_sites_api)
+        cache_app.append(cache_user)
+    return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2])
 
-@app.route("/save_search/<int:index_list_results>/<int:index_result>/")
+@app.route("/save_search/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
 @login_required
-def save_search(index_list_results, index_result):
-    global list_sites
-    global list_results #verificar se já esta no banco de dados e impedir de incluir novamente
-    name_site = list_sites[int(index_list_results)]["name"]
-    api_site = list_sites[index_list_results]["api_parameter"]
+def save_search(index_list_results, index_result, name_site, api_site):
+    #global list_sites
+    #global list_results #verificar se já esta no banco de dados e impedir de incluir novamente
+    list_results = []
+    list_sites_api = []
+    cache_user = []
+    global cache_app
+    for x in range(len(cache_app)):
+        if current_user.email == cache_app[x][0]:              
+            cache_user = cache_app[x]
+            break  
+    if cache_user:                                
+        list_results = cache_user[1]
+        list_sites_api = cache_user[2]
+    #name_site = site["name"]
+    #api_site = site["api_parameter"]
     save_item = list_results[index_list_results][index_result]
+    print(name_site)
+    print(api_site)
     learning_object = LearningObject(save_item, name_site, api_site)
     database.create("learning_objects", learning_object)
-    return render_template("results_search_api.html", list_results=list_results)
+    return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api)
 
 @app.route("/search_database/")
 def search_database():
     sites = database.list("sites")
-    global list_sites
+    list_sites = []
     for site in sites:
         list_sites.append(site["site"])
     return render_template("search_database.html", sites=list_sites)
@@ -156,9 +182,11 @@ def view_learning_objects():
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
 @login_required
-@app.route("/view_learning_object/")
-def view_learning_object():
-    return render_template("view_learning_object.html")
+@app.route("/view_learning_object/<int:id_learning_object>")
+def view_learning_object(id_learning_object):
+    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
+    print(learning_object[0])
+    return render_template("view_learning_object.html", learning_object=learning_object[0])
 
 #### Login, Registro, Perfil e Logout ####
 
@@ -211,6 +239,11 @@ def login():
 @app.route("/logout/", methods=['GET', 'POST'])
 @login_required
 def logout():
+    global cache_app
+    for x in range(len(cache_app)):
+        if current_user.email == cache_app[x][0]:              
+            cache_app.pop(x)
+            break
     logout_user()
     return redirect(url_for("login"))
 

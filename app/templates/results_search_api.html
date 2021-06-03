@@ -43,7 +43,7 @@
                   <thead>
                   <tr>
                     <th>Ação</th>
-                    <th>Index</th>
+                    <th>Site</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
@@ -56,14 +56,14 @@
                         {% set index_result = loop.index-1 %}
                         <tr>
                           <td>
-                            <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result) }}" class="btn btn-secondary btn-icon-split">
+                            <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
                               <span class="icon text-white-50">
                                   <i class="fas fa-plus"></i>
                               </span>
                               <span class="text">Adicionar</span>
                             </a>
                           </td>
-                          <td>{{ save_search }}/{{ index_list_results }}/{{ index_result }}/</td>
+                          <td>{{ list_sites_api[index_list_results]['name'] | safe }} - {{ index_result+1 }}</td>
                           <td>{{ result['title'] | safe }}</td>
                           <td>{{ result['tags'] | safe }}</td>
                           <td><a href="{{ result['link'] }}" target="_blank">{{ result['link'] }}</a></td>
@@ -74,7 +74,7 @@
                   <tfoot>
                   <tr>
                     <th>Ação</th>
-                    <th>Index</th>
+                    <th>Site</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
