@@ -20,7 +20,8 @@ class LearningObject():
             "structure": ["linear", "Hireárquico"],
             "aggregation_level": "2"
         }
-        self.life_cycle = {
+        try:
+            self.life_cycle = {
             "version": None,
             "status": "Revisado",
             "contribute":{
@@ -29,20 +30,46 @@ class LearningObject():
                 "date": learning_object_item["creation_date"]
             }
         }
-        self.meta_metadata = {
-            "identifier": learning_object_item["question_id"],
-            "catalog":{
-                "catalog": learning_object_item["tags"],
-                "entry": None
-            },
-            "contribute":{
-                "role": "Autor",
-                "entity": "{}-{}".format(str(learning_object_item["owner"]["user_id"]), str(learning_object_item["owner"]["display_name"])),
-                "date": learning_object_item["creation_date"]
-            },
-            "metadata_scheme": "IEEE LOM",
-            "language": None
-        }
+        except:
+            self.life_cycle = {
+                "version": None,
+                "status": "Revisado",
+                "contribute":{
+                    "role": "Autor",
+                    "entity": "{}-{}".format("0", str(learning_object_item["owner"]["display_name"])),
+                    "date": learning_object_item["creation_date"]
+                }
+            }
+        try:
+            self.meta_metadata = {
+                "identifier": learning_object_item["question_id"],
+                "catalog":{
+                    "catalog": learning_object_item["tags"],
+                    "entry": None
+                },
+                "contribute":{
+                    "role": "Autor",
+                    "entity": "{}-{}".format(str(learning_object_item["owner"]["user_id"]), str(learning_object_item["owner"]["display_name"])),
+                    "date": learning_object_item["creation_date"]
+                },
+                "metadata_scheme": "IEEE LOM",
+                "language": None
+            }
+        except:
+            self.meta_metadata = {
+                "identifier": learning_object_item["question_id"],
+                "catalog":{
+                    "catalog": learning_object_item["tags"],
+                    "entry": None
+                },
+                "contribute":{
+                    "role": "Autor",
+                    "entity": "{}-{}".format("0", str(learning_object_item["owner"]["display_name"])),
+                    "date": learning_object_item["creation_date"]
+                },
+                "metadata_scheme": "IEEE LOM",
+                "language": None
+            }
         self.technical = {
             "format": "text/html",
             "size": None,

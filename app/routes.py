@@ -114,50 +114,75 @@ def results_search_api():
                 if option == site["site"]["api_parameter"]:
                     list_sites_api.append(site["site"])
                     break
-    for api_parameter in list_sites_api:
-        list_result_items = stackexchange.search_advanced(str(search), str(api_parameter["api_parameter"]))
+    for site in list_sites_api:
+        list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]))
         list_results.append(list_result_items)
+    
+    update_results = []
+    update = []
+    for results, site in zip(list_results, list_sites_api):
+        for result in results:
+            item_db = database.filter_by('learning_objects', {"general.identifier": result["question_id"]})
+            if item_db:
+                update.append(1)
+            else:
+                update.append(0)
+        update_results.append(update)
+        update = []
     
     cache_user = []
     for x in range(len(cache_app)):
-        print(current_user.email == cache_app[x][0])
         if current_user.email == cache_app[x][0]:              
             cache_user = cache_app[x]
             break        
     if cache_user:
         cache_user[1] = list_results
         cache_user[2] = list_sites_api
+        cache_user[3] = update_results
     else:
         cache_user.append(current_user.email)
         cache_user.append(list_results)
         cache_user.append(list_sites_api)
+        cache_user.append(update_results)
         cache_app.append(cache_user)
-    return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2])
+    
+    return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
 
 @app.route("/save_search/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
 @login_required
 def save_search(index_list_results, index_result, name_site, api_site):
-    #global list_sites
-    #global list_results #verificar se já esta no banco de dados e impedir de incluir novamente
     list_results = []
     list_sites_api = []
+    update_results = []
     cache_user = []
     global cache_app
+    user = None
     for x in range(len(cache_app)):
         if current_user.email == cache_app[x][0]:              
             cache_user = cache_app[x]
+            user = x
             break  
     if cache_user:                                
         list_results = cache_user[1]
         list_sites_api = cache_user[2]
-    #name_site = site["name"]
-    #api_site = site["api_parameter"]
+        update_results = cache_user[3]       
     save_item = list_results[index_list_results][index_result]
-    print(name_site)
-    print(api_site)
+    #verificar se já esta no banco de dados e impedir de incluir novamente
     learning_object = LearningObject(save_item, name_site, api_site)
-    database.create("learning_objects", learning_object)
-    return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api)
+    learning_object_json = learning_object.get_as_json()
+    item_db = database.filter_by('learning_objects', {"general.identifier": learning_object_json['general']['identifier'][1]})
+    if not item_db:
+        print("create")
+        database.create("learning_objects", learning_object)
+        update_results[index_list_results][index_result] = 1
+        cache_user[3] = update_results
+        cache_app[user] = cache_user
+        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
+    else:
+        print("update")
+        database.update("learning_objects", item_db[0])
+        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
+
 
 @app.route("/search_database/")
 def search_database():

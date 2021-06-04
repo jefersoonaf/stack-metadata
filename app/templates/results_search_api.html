@@ -42,8 +42,8 @@
                 <table id="data-table" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Ação</th>
                     <th>Site</th>
+                    <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
@@ -55,15 +55,24 @@
                       {% for result in result_for_site %}
                         {% set index_result = loop.index-1 %}
                         <tr>
-                          <td>
-                            <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-plus"></i>
-                              </span>
-                              <span class="text">Adicionar</span>
-                            </a>
-                          </td>
                           <td>{{ list_sites_api[index_list_results]['name'] | safe }} - {{ index_result+1 }}</td>
+                          <td>
+                            {% if update_results[index_list_results][index_result] == 1 %}
+                              <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-sync-alt"></i>
+                                </span>
+                                <span class="text">Atualizar</span>
+                              </a>
+                            {% else %}
+                              <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-primary btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span class="text">Adicionar</span>
+                              </a>
+                            {% endif %}
+                          </td>                          
                           <td>{{ result['title'] | safe }}</td>
                           <td>{{ result['tags'] | safe }}</td>
                           <td><a href="{{ result['link'] }}" target="_blank">{{ result['link'] }}</a></td>
@@ -73,8 +82,8 @@
                   </tbody>
                   <tfoot>
                   <tr>
-                    <th>Ação</th>
                     <th>Site</th>
+                    <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
