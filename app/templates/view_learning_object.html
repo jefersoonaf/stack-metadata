@@ -36,7 +36,7 @@
             <div class="card">
               <!-- ./card-header -->
 
-              <!-- General -->
+              <!-------------------------------------------- General --------------------------------------------->
               <div class="card-body p-0">
                 <table class="table table-hover">                  
                   <tbody>
@@ -101,13 +101,74 @@
                                   </div>
                                 </td>
                               </tr>
+
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Catálogo e Entrada</b> 
+                                </td>
+                              </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr data-widget="expandable-table" aria-expanded="true">
+                                          <td>
+                                            <button type="button" class="btn btn-primary p-0">
+                                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                            </button>
+                                            <b>Catálogo</b> 
+                                          </td>
+                                        </tr>
+                                        <tr class="expandable-body">
+                                          <td>
+                                            <div class="p-0">
+                                              <table class="table table-hover">
+                                                <tbody>
+                                                  <tr>
+                                                    <td>{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}</td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                        <tr data-widget="expandable-table" aria-expanded="true">
+                                          <td>
+                                            <button type="button" class="btn btn-primary p-0">
+                                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                            </button>
+                                            <b>Entrada</b> 
+                                          </td>
+                                        </tr>
+                                        <tr class="expandable-body">
+                                          <td>
+                                            <div class="p-0">
+                                              <table class="table table-hover">
+                                                <tbody>
+                                                  <tr>
+                                                    <td>{{ learning_object['general']['catalog_entry']['entry'] | safe }}</td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
                               
                               <tr data-widget="expandable-table" aria-expanded="true">
                                 <td>
                                   <button type="button" class="btn btn-primary p-0">
                                     <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
                                   </button>
-                                  219-2
+                                  <b>Idioma</b> 
                                 </td>
                               </tr>
                               <tr class="expandable-body">
@@ -116,22 +177,168 @@
                                     <table class="table table-hover">
                                       <tbody>
                                         <tr>
-                                          <td>219-2-1</td>
-                                        </tr>
-                                        <tr>
-                                          <td>219-2-2</td>
-                                        </tr>
-                                        <tr>
-                                          <td>219-2-3</td>
+                                          <td>{{ learning_object['general']['language'] | safe }}</td>
                                         </tr>
                                       </tbody>
                                     </table>
                                   </div>
                                 </td>
                               </tr>
-                              <tr>
-                                <td>219-3</td>
+                              
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Descrição</b> 
+                                </td>
                               </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr data-widget="expandable-table" aria-expanded="true">
+                                          <td>
+                                            <button type="button" class="btn btn-primary p-0">
+                                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                            </button>
+                                            <b>Questão</b> 
+                                          </td>
+                                        </tr>
+                                        <tr class="expandable-body">
+                                          <td>
+                                            <div class="p-0">
+                                              <table class="table table-hover">
+                                                <tbody>
+                                                  <tr>
+                                                    <td>{{ learning_object['general']['description']['question'] | safe }}</td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                        <tr data-widget="expandable-table" aria-expanded="true">
+                                          <td>
+                                            <button type="button" class="btn btn-primary p-0">
+                                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                            </button>
+                                            <b>Respostas</b> 
+                                          </td>
+                                        </tr>
+                                        <tr class="expandable-body">
+                                          <td>
+                                            <div class="p-0">
+                                              <table class="table table-hover">
+                                                <tbody>
+                                                  {% for answer in learning_object['general']['description']['answers'] %}
+                                                    <tr>
+                                                      <td>Resposta - {{ loop.index }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td>{{ answer['body'] | safe }}</td>
+                                                    </tr>
+                                                  {% endfor %}                                                  
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+                              
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Palavras Chave</b> 
+                                </td>
+                              </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr>
+                                          <td>{{ learning_object['general']['keywords'] | safe }}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Cobertura</b> 
+                                </td>
+                              </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr>
+                                          <td>{{ learning_object['general']['coverage'] | safe }}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Estrutura</b> 
+                                </td>
+                              </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr>
+                                          <td>{{ learning_object['general']['structure'] | safe }}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              <tr data-widget="expandable-table" aria-expanded="true">
+                                <td>
+                                  <button type="button" class="btn btn-primary p-0">
+                                    <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                  </button>
+                                  <b>Nível de Agregação</b> 
+                                </td>
+                              </tr>
+                              <tr class="expandable-body">
+                                <td>
+                                  <div class="p-0">
+                                    <table class="table table-hover">
+                                      <tbody>
+                                        <tr>
+                                          <td>{{ learning_object['general']['aggregation_level'] | safe }}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+
                             </tbody>
                           </table>
                         </div>
@@ -140,7 +347,7 @@
                   </tbody>
                 </table>
               </div>
-              <!-- /.General -->
+              <!-------------------------------------------- /.General --------------------------------------------->
             </div>
             <!-- /.card -->
           </div>

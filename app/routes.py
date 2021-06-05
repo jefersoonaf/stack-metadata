@@ -105,7 +105,7 @@ def results_search_api():
     list_sites_api = []
     global cache_app
     list_results = []
-    select = request.form.getlist('multi-select')
+    select = request.form.getlist('selected-sites')
     if select:
         for option in select:                                       ### criar ium objeto learning object, passar ele para uma variavel e em seguida colocar na lista para mandar para o html
             option = option.split("-")[1]

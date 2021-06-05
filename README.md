@@ -19,15 +19,17 @@ Também deve conter a Key fornecida pela API do StackExchange da seguinte forma:
 ```
 API_KEY = 'sua chave da API aqui'
 ```
+
+Você pode conseguir uma key da api do StackExchange se registrando aqui: https://stackapps.com/apps/oauth/register
 ## Instalando e executando o ambiente virtual
 ```
 python3.9 -m pip install virtualenv
 ```
 ```
-python3.9 -m venv tp2
+python3.9 -m venv venv
 ```
 ```
-source tp2/bin/activate
+source venv/bin/activate
 ```
 
 ## Instalação das bibliotecas
