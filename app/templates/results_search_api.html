@@ -55,7 +55,7 @@
                       {% for result in result_for_site %}
                         {% set index_result = loop.index-1 %}
                         <tr>
-                          <td>{{ list_sites_api[index_list_results]['name'] | safe }} - {{ index_result+1 }}</td>
+                          <td>{{ list_sites_api[index_list_results]['name'] | safe }}</td>
                           <td>
                             {% if update_results[index_list_results][index_result] == 1 %}
                               <a href="{{ url_for('save_search', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">

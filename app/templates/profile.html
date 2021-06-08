@@ -13,7 +13,7 @@
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
               <li class="breadcrumb-item active">User Profile</li>
             </ol>
           </div>
@@ -31,9 +31,10 @@
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle"
+                  <i class="fas fa-user fa-9x"></i>
+                  <!--<img class="profile-user-img img-fluid img-circle"
                        src="{{ url_for('static', filename='dist/img/user_icon.png') }}"
-                       alt="User profile picture">
+                       alt="User profile picture"> -->
                 </div>
 
                 <h3 class="profile-username text-center">{{ current_user.name }}</h3>

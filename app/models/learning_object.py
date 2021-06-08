@@ -42,10 +42,10 @@ class LearningObject():
             }
         try:
             self.meta_metadata = {
-                "identifier": learning_object_item["question_id"],
+                "identifier": [str(api_site), learning_object_item["question_id"]],
                 "catalog":{
                     "catalog": learning_object_item["tags"],
-                    "entry": None
+                    "entry": learning_object_item["link"]
                 },
                 "contribute":{
                     "role": "Autor",
@@ -57,10 +57,10 @@ class LearningObject():
             }
         except:
             self.meta_metadata = {
-                "identifier": learning_object_item["question_id"],
+                "identifier": [str(api_site), learning_object_item["question_id"]],
                 "catalog":{
                     "catalog": learning_object_item["tags"],
-                    "entry": None
+                    "entry": learning_object_item["link"]
                 },
                 "contribute":{
                     "role": "Autor",

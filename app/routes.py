@@ -99,7 +99,7 @@ def search_api():
 @login_required
 def results_search_api():
     search = request.form.get('search')
-    stackexchange = StackExchange(2, 1)
+    stackexchange = StackExchange(30, 1)
     
     sites = database.list("sites")
     list_sites_api = []

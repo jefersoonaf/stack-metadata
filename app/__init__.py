@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-database = Database("meta_v1")
+database = Database("meta_v2")
 
 #app = Flask(__name__, template_folder='../templates', static_folder='../static') 
 #FLASK_APP=run.py
 app = Flask('app') 
 app.config.update(
     SECRET_KEY = SECRET_KEY,
-    DEBUG=True
+    DEBUG = True
 )
 
 login_manager = LoginManager()
