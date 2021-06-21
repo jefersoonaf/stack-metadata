@@ -33,7 +33,8 @@ class StackExchange():
     
     def search_advanced(self, title_parameter, site_parameter):
         """self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!)E0fBjq-AsnarVKlARBxRcJDFDX8j60oDmcDl3M9iAJhKYBIq")"""
-        self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!SBpEoG7Z8a5aJlA_l*BbIj*_*YTAdFUkcd4Q53dk_K7tBfHZCox5iskb.DMw4chD")
+        self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!1v9wA_b0TvaNe0Jko_zIHaSwt5vMy*VHH.lMAl91lcG.cUUGmu3lkf365mQjY53oS(1")
+        """self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={title_parameter}&site={site_parameter}&filter=!SBpEoG7Z8a5aJlA_l*BbIj*_*YTAdFUkcd4Q53dk_K7tBfHZCox5iskb.DMw4chD")"""
         print(self.current_url)
         response = requests.get(self.current_url)
         page_items = response.json()

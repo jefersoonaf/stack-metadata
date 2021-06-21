@@ -1,0 +1,2085 @@
+{% extends 'layout.html' %}
+{% block title %} StackMetadata | Edição {% endblock title %}
+{% block head %}
+  {{ super() }}
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock head %}
+{% block section_content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">            
+            <h1>
+              <i class="fas fa-eye"></i>
+              Visualização: 
+              <a href="{{ learning_object['general']['catalog_entry']['entry'] }}" target="_blank">{{ learning_object['general']['identifier'][0] | safe | capitalize }} - {{ learning_object['general']['identifier'][1] | safe }}</a>
+            </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+              <li class="breadcrumb-item"><a href="{{ url_for('view_learning_objects') }}">Objetos de Aprendizagem</a></li>
+              <li class="breadcrumb-item active">Edição</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <form id="edit" action="{{ url_for('save_edit') }}" method="POST">
+          <button onclick="save_edit()">Salvar</button>
+          <!-------------------------------------------- General --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Geral</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Identificadores</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="general.identifier" type="text" value="{{ learning_object['general']['identifier'][0] | safe | capitalize }}">
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="general.identifier" type="text" value="{{ learning_object['general']['identifier'][1] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Título</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="general.title" type="text" value="{{ learning_object['general']['title'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Catálogo e Entrada</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Catálogo</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="general.catalog_entry.catalogue" type="text" value="{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Entrada</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="general.catalog_entry.entry" type="text" value="{{ learning_object['general']['catalog_entry']['entry'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Idioma</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="general.language" type="text" value="{{ learning_object['general']['language'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Descrição</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Questão</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="general.description.question" type="text" value="{{ learning_object['general']['description']['question'] | safe }}">                                                        
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Respostas</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    {% for answer in learning_object['general']['description']['answers'] %}                                                  
+                                                      <tr>
+                                                        <td>                                                          
+                                                          <b>Resposta - {{ loop.index }}</b><br>
+                                                          É a resposta? <input class="form-control col-1" name="general.answers.is_accepted" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          Usuário que respondeu:
+                                                          <div class="row col-12 align-items-center">
+                                                            <input class="form-control col-1" name="general.answers.owner.user_id" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="answers.owner.display_name" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                          </div>   
+                                                          Likes: <input class="form-control col-1" name="general.answers.up_vote_count" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="general.answers.down_vote_count" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="general.answers.creation_date" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="general.answers.last_activity_date" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="general.description.answers.body" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                        </td>
+                                                      </tr>
+                                                    {% endfor %}                                                  
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Palavras Chave</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['keywords'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Cobertura</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['coverage'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Estrutura</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['structure'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Nível de Agregação</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['aggregation_level'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.General --------------------------------------------->
+
+          <!-------------------------------------------- Live_Cicle --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Ciclo de Vida</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Versão</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['version'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Status</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['status'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Contribuição</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Função</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['role'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Entidade</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['entity'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Data</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['date'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                              
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Life_Cicle --------------------------------------------->
+
+          <!-------------------------------------------- Meta_Metadata --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Meta Metadados</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Identificadores</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['identifier'][0] | safe | capitalize }}">
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['identifier'][1] | safe | capitalize }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                              
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Catálogo e Entrada</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Catálogo</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['catalog']['catalog'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Entrada</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['catalog']['entry'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Contribuição</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Função</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['role'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Entidade</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['entity'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Data</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['date'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>   
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Esquema do Metadado</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['metadata_scheme'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Idioma</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['language'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Meta_Metadata --------------------------------------------->
+
+          <!-------------------------------------------- Technical --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Técnico</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Formato</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['format'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Tamanho</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['size'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Localização/Link</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['location'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Requisitos</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Tipo</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['type'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Name</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['name'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Versão Mínima</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['min_version'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Versão Máxima</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['max_version'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Observações de Instalação</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['installation_remarks'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Outros Requisitos de Plataforma</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['other_platform_requirements'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Duração</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['duration'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Technical --------------------------------------------->
+
+          <!-------------------------------------------- Educational --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Educacional</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Tipo Interativo</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['interactivity_type'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>     
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Tipo de Recurso de Aprendizagem</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['learning_resource_type'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                            
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Nível Interativo</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['interactivity_level'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Densidade Semântica</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['semantic_density'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Função de Usuário Final Pretendida</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['intended_end_user_role'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Contexto</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['context'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Faixa Etária Típica</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['typical_age_range'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Dificuldade</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['difficulty'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Tempo de Aprendizagem Típico</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['typical_learning_time'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Descrição</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['description'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Idioma</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['language'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                      
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Educational --------------------------------------------->
+
+          <!-------------------------------------------- Rights --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Direitos</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Custo</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['cost'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>     
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Direitos Autorais e Outras Restrições</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['copyright_&_other_restrictions'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                            
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Descrição</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['description'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                 
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Rights --------------------------------------------->
+
+          <!-------------------------------------------- Relation --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Relação</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Espécie</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['kind'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                      
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Recursos</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Identificador</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['identifier'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Descrição</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['description'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Catálogo e Entrada</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['catalog_entry'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                               
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Relation --------------------------------------------->
+
+          <!-------------------------------------------- Anotation --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Anotações</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Pessoa</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['person'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>     
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Data</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['date'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                            
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Descrição</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['description'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                                 
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Anotation --------------------------------------------->
+
+          <!-------------------------------------------- Classification --------------------------------------------->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <!-- ./card-header -->            
+                <div class="card-body p-0">
+                  <table class="table table-hover">                  
+                    <tbody>
+                      <tr data-widget="expandable-table" aria-expanded="true">
+                        <td class="bg-gray rounded">
+                          <h5>
+                            <button type="button" class="btn btn-primary p-0">
+                              <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            </button>
+                            <b>Classificação</b>
+                          </h5>
+                        </td>
+                      </tr>
+                      <tr class="expandable-body">
+                        <td>
+                          <div class="p-0">
+                            <table class="table table-hover">
+                              <tbody>
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Objetivo</b>                                  
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['purpose'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Caminho do Táxon</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Fonte</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['source'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Táxon</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr data-widget="expandable-table" aria-expanded="true">
+                                                      <td>
+                                                        <button type="button" class="btn btn-primary p-0">
+                                                          <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                                        </button>
+                                                        <b>ID</b> 
+                                                      </td>
+                                                    </tr>
+                                                    <tr class="expandable-body">
+                                                      <td>
+                                                        <div class="p-0">
+                                                          <table class="table table-hover">
+                                                            <tbody>
+                                                              <tr>
+                                                                <td>
+                                                                  <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['id'] | safe }}">
+                                                                </td>
+                                                              </tr>
+                                                            </tbody>
+                                                          </table>
+                                                        </div>
+                                                      </td>
+                                                    </tr>
+                                                    <tr data-widget="expandable-table" aria-expanded="true">
+                                                      <td>
+                                                        <button type="button" class="btn btn-primary p-0">
+                                                          <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                                        </button>
+                                                        <b>Entrada</b> 
+                                                      </td>
+                                                    </tr>
+                                                    <tr class="expandable-body">
+                                                      <td>
+                                                        <div class="p-0">
+                                                          <table class="table table-hover">
+                                                            <tbody>
+                                                              <tr>
+                                                                <td>
+                                                                  <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['entry'] | safe }}">
+                                                                </td>
+                                                              </tr>
+                                                            </tbody>
+                                                          </table>
+                                                        </div>
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Descrição</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Questão</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td>
+                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['description']['question'] | safe }}">
+                                                      </td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr data-widget="expandable-table" aria-expanded="true">
+                                            <td>
+                                              <button type="button" class="btn btn-primary p-0">
+                                                <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                              </button>
+                                              <b>Respostas</b> 
+                                            </td>
+                                          </tr>
+                                          <tr class="expandable-body">
+                                            <td>
+                                              <div class="p-0">
+                                                <table class="table table-hover">
+                                                  <tbody>
+                                                    {% for answer in learning_object['classification']['description']['answers'] %}                                                  
+                                                      <tr>
+                                                        <td>                                                          
+                                                          <b>Resposta - {{ loop.index }}</b><br>
+                                                          É a resposta? <input class="form-control col-1" name="classification.answers.is_accepted" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          Usuário que respondeu:
+                                                          <div class="row col-12 align-items-center">
+                                                            <input class="form-control col-1" name="classification.answers.owner.user_id" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="answers.owner.display_name" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                          </div>   
+                                                          Likes: <input class="form-control col-1" name="classification.answers.up_vote_count" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="classification.answers.down_vote_count" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="classification.answers.creation_date" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="classification.answers.last_activity_date" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="classification.description.answers.body" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                        </td>
+                                                      </tr>
+                                                    {% endfor %}                                                
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <tr data-widget="expandable-table" aria-expanded="true">
+                                  <td>
+                                    <button type="button" class="btn btn-primary p-0">
+                                      <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                                    </button>
+                                    <b>Palavras Chave</b> 
+                                  </td>
+                                </tr>
+                                <tr class="expandable-body">
+                                  <td>
+                                    <div class="p-0">
+                                      <table class="table table-hover">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['keywords'] | safe }}">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>              
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+          <!-------------------------------------------- /.Classification --------------------------------------------->
+        
+        </form>
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock section_content %}
+{% block scripts %}
+  {{ super() }}
+    <script>
+      function save_edit(){
+        $(function(){
+            var value_question = $("#generalDescriptionQuestionDiv").html();
+            document.getElementById("generalDescriptionQuestion").setAttribute('value',value_question);
+        });
+        $(function(){
+
+            var value_answers = document.getElementsByClassName("general_description_answers_div")
+            for(var i = 0; i < value_answers.length; i++) {
+              document.getElementById("general_description_answers_${i}").setAttribute('value',value_answers[i].innerHTML);
+            }
+
+            $("#edit").submit();
+        });        
+      }
+    </script>
+{% endblock scripts %}

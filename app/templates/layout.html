@@ -1,47 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-{% block head %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %} StackMetadata {% endblock %}</title>
+  <title>{% block title %} StackMetadata {% endblock title%}</title>
+  {% block head %}
+    <!-- Logo -->
+    <link rel="sortcut icon" href="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" type="image/png" />
 
-  <!-- Logo -->
-  <link rel="sortcut icon" href="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" type="image/png" />;
-
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='plugins/fontawesome-free/css/all.min.css') }}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
-  <style>
-    pre {
-      background: #f4f4f4;
-      border: 1px solid #ddd;
-      border-left: 3px solid #f36d33;
-      color: rgb(70, 70, 70);
-      page-break-inside: avoid;
-      font-family: monospace;
-      font-size: 12px;
-      line-height: 1.6;
-      margin-bottom: 1.6em;
-      max-width: 100%;
-      overflow: auto;
-      padding: 1em 1.5em;
-      display: block;
-      word-wrap: break-word;
-    }
-  </style>
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
+    <style>
+      pre {
+        background: #f4f4f4;
+        border: 1px solid #ddd;
+        border-left: 3px solid #f36d33;
+        color: rgb(70, 70, 70);
+        page-break-inside: avoid;
+        font-family: monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: 1.6em;
+        max-width: 100%;
+        overflow: auto;
+        padding: 1em 1.5em;
+        display: block;
+        word-wrap: break-word;
+      }
+    </style>
+  {% endblock head %}
 </head>
-{% endblock head %}
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+<body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
 <div class="wrapper">
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" alt="StackMetadata Logo" height="60" width="60">
+    <img class="animation__wobble" src="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" height="60" width="60">
   </div>
 
   <!-- Navbar -->
@@ -64,19 +63,22 @@
           <!-- <img src="{{ url_for('static', filename='dist/img/user_icon.png') }}" class="user-image img-circle elevation-2" alt="User Image"> -->          
           <span class="d-none d-md-inline">{{ current_user.name }}</span>
         </a>
-        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <!-- User image -->
-          <li class="user-header bg-primary">
-            <img src="{{ url_for('static', filename='dist/img/user_icon.png') }}" class="img-circle elevation-2" alt="User Image">
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right rounded">
+          <!-- User image -->                       
+          <li class="user-header bg-gray rounded-top">
+            <i class="fas fa-user-circle fa-4x"></i>
 
             <p>
-              {{ current_user.name }}
+              <b>{{ current_user.name }}</b>
+            </p>
+            <p>
+              {{ current_user.email }}
             </p>
           </li>
           <!-- Menu Footer-->
-          <li class="user-footer">
-            <a href="{{ url_for('profile') }}" class="btn btn-default btn-flat">Profile</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-default btn-flat float-right">Logout</a>
+          <li class="user-footer rounded-bottom">
+            <a href="{{ url_for('profile') }}" class="btn btn-info">Perfil</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger float-right">Sair</a>
           </li>
         </ul>
       </li>

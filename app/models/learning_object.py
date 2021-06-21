@@ -127,8 +127,8 @@ class LearningObject():
             "description":{
                 "question": learning_object_item["body"],
                 "answers": learning_object_item["answers"],
+            },
             "keywords": learning_object_item["tags"]
-        }
     }
 
     def get_as_json(self):

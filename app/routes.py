@@ -1,4 +1,5 @@
 #import flask app
+from flask_wtf import form
 from app import app 
 #import dos metodos do flask
 from flask import Flask, request, render_template, url_for, redirect, flash
@@ -210,8 +211,21 @@ def view_learning_objects():
 @app.route("/view_learning_object/<int:id_learning_object>")
 def view_learning_object(id_learning_object):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
-    print(learning_object[0])
     return render_template("view_learning_object.html", learning_object=learning_object[0])
+
+@login_required
+@app.route("/edit_learning_object/<int:id_learning_object>")
+def edit_learning_object(id_learning_object):
+    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
+    return render_template("edit_learning_object.html", learning_object=learning_object[0])
+
+@login_required
+@app.route("/save_edit/", methods=['POST'])
+def save_edit():
+    test = request.form.to_dict(False)
+    
+    print(test)
+    return redirect(url_for("index"))
 
 #### Login, Registro, Perfil e Logout ####
 
@@ -245,7 +259,6 @@ def login():
             email = form.email.data
             password = form.password.data
             remember = form.remember.data
-            print(remember)
             query = database.filter_by('users', {"email": email})
             if query:
                 user_bd = query[0]
@@ -337,6 +350,13 @@ def errorPage(e):
 
 #### test ####
 
-@app.route("/test/", methods=['GET'])
+@app.route("/test/", methods=['GET', 'POST'])
 def test():
-    return render_template("profile.html")
+    return render_template("test.html")
+
+@app.route("/test2/", methods=['POST'])
+def test2():
+    res = request.get_json()
+    print(res)
+    print("\n\nPOST\n\n")
+    return redirect(url_for("test"))
