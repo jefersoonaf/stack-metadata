@@ -208,23 +208,22 @@ def view_learning_objects():
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
 @login_required
-@app.route("/view_learning_object/<int:id_learning_object>")
+@app.route("/view_learning_object/<int:id_learning_object>", methods=['GET', 'POST'])
 def view_learning_object(id_learning_object):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
     return render_template("view_learning_object.html", learning_object=learning_object[0])
 
 @login_required
-@app.route("/edit_learning_object/<int:id_learning_object>")
+@app.route("/edit_learning_object/<int:id_learning_object>", methods=['GET', 'POST'])
 def edit_learning_object(id_learning_object):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
     return render_template("edit_learning_object.html", learning_object=learning_object[0])
 
 @login_required
-@app.route("/save_edit/", methods=['POST'])
+@app.route("/save_edit/", methods=['GET', 'POST'])
 def save_edit():
-    test = request.form.to_dict(False)
-    
-    print(test)
+    res = request.get_json()
+    print('\n',json.dumps(res, indent=2),'\n')
     return redirect(url_for("index"))
 
 #### Login, Registro, Perfil e Logout ####
@@ -352,11 +351,22 @@ def errorPage(e):
 
 @app.route("/test/", methods=['GET', 'POST'])
 def test():
-    return render_template("test.html")
-
-@app.route("/test2/", methods=['POST'])
-def test2():
     res = request.get_json()
-    print(res)
-    print("\n\nPOST\n\n")
-    return redirect(url_for("test"))
+    if res:
+        print('\n',res,'\n')
+        return redirect(url_for("index"))
+    else:
+        return render_template("test.html")
+global aux
+aux=1
+@app.route("/test2/", methods=['GET', 'POST'])
+def test2():
+    global aux
+    if request.method == 'POST':
+        res = request.get_json()
+        print(aux)
+        print('\n',res,'\n')
+        aux+=1
+        return redirect(url_for("index"))
+    else:
+        return {"message": "Não enviado, método GET"}

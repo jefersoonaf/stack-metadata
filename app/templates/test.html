@@ -33,7 +33,7 @@
       var obj = $('#form').serializeJSON();
       var jsonString = JSON.stringify(obj);
 
-      var url = "http://127.0.0.1:5000/test2/";
+      var url = "{{ url_for('test') }}";
 
       var xhr = new XMLHttpRequest();
       xhr.open("POST", url);

@@ -35,8 +35,8 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <form id="edit" action="{{ url_for('save_edit') }}" method="POST">
-          <button onclick="save_edit()">Salvar</button>
+        <form id="form" action="{{ url_for('save_edit') }}" method="POST">
+          <input type="submit" onclick="sendjson()" value="Salvar"/>
           <!-------------------------------------------- General --------------------------------------------->
           <div class="row">
             <div class="col-12">
@@ -75,12 +75,12 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="general.identifier" type="text" value="{{ learning_object['general']['identifier'][0] | safe | capitalize }}">
+                                              <input disabled class="form-control" name="general[identifier][0]" type="text" value="{{ learning_object['general']['identifier'][0] | safe | capitalize }}">
                                             </td>
                                           </tr>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="general.identifier" type="text" value="{{ learning_object['general']['identifier'][1] | safe }}">
+                                              <input disabled class="form-control" name="general[identifier][1]" type="text" value="{{ learning_object['general']['identifier'][1] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -104,7 +104,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="general.title" type="text" value="{{ learning_object['general']['title'] | safe }}">
+                                              <input class="form-control" name="general[title]" type="text" value="{{ learning_object['general']['title'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -141,7 +141,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="general.catalog_entry.catalogue" type="text" value="{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}">
+                                                        <input class="form-control" name="general[catalog_entry][catalogue]" type="text" value="{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -164,7 +164,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="general.catalog_entry.entry" type="text" value="{{ learning_object['general']['catalog_entry']['entry'] | safe }}">
+                                                        <input class="form-control" name="general[catalog_entry][entry]" type="text" value="{{ learning_object['general']['catalog_entry']['entry'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -193,7 +193,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="general.language" type="text" value="{{ learning_object['general']['language'] | safe }}">
+                                              <input class="form-control" name="general[language]" type="text" value="{{ learning_object['general']['language'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -230,7 +230,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="general.description.question" type="text" value="{{ learning_object['general']['description']['question'] | safe }}">                                                        
+                                                        <input class="form-control" name="general[description][question]" type="text" value="{{ learning_object['general']['description']['question'] | safe }}">                                                        
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -255,16 +255,16 @@
                                                       <tr>
                                                         <td>                                                          
                                                           <b>Resposta - {{ loop.index }}</b><br>
-                                                          É a resposta? <input class="form-control col-1" name="general.answers.is_accepted" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          É a resposta? <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][is_accepted]" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
                                                           Usuário que respondeu:
                                                           <div class="row col-12 align-items-center">
-                                                            <input class="form-control col-1" name="general.answers.owner.user_id" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="answers.owner.display_name" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                            <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][owner][user_id]" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="general[description][answers][{{ loop.index }}][owner][display_name]" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
                                                           </div>   
-                                                          Likes: <input class="form-control col-1" name="general.answers.up_vote_count" type="text" value="{{ answer['up_vote_count'] | safe }}">
-                                                          Deslikes: <input class="form-control col-1" name="general.answers.down_vote_count" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
-                                                          Data da resposta: <input class="form-control col-1" name="general.answers.creation_date" type="text" value="{{ answer['creation_date'] | safe }}">
-                                                          Data da última alteração: <input class="form-control col-1" name="general.answers.last_activity_date" type="text" value="{{ answer['last_activity_date'] | safe }}">
-                                                          Corpo da resposta: <textarea class="form-control" name="general.description.answers.body" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                          Likes: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][up_vote_count]" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][down_vote_count]" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][creation_date]" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][last_activity_date]" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="general[description][answers][{{ loop.index }}][body]" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
                                                         </td>
                                                       </tr>
                                                     {% endfor %}                                                  
@@ -294,7 +294,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['keywords'] | safe }}">
+                                              <input class="form-control" name="general[keywords]" type="text" value="{{ learning_object['general']['keywords'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -318,7 +318,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['coverage'] | safe }}">
+                                              <input class="form-control" name="general[coverage]" type="text" value="{{ learning_object['general']['coverage'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -342,7 +342,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['structure'] | safe }}">
+                                              <input class="form-control" name="general[structure]" type="text" value="{{ learning_object['general']['structure'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -366,7 +366,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['general']['aggregation_level'] | safe }}">
+                                              <input class="form-control" name="general[aggregation_level]" type="text" value="{{ learning_object['general']['aggregation_level'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -428,7 +428,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['version'] | safe }}">
+                                              <input class="form-control" name="live_cycle[version]" type="text" value="{{ learning_object['life_cycle']['version'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -452,7 +452,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['status'] | safe }}">
+                                              <input class="form-control" name="life_cycle[status]" type="text" value="{{ learning_object['life_cycle']['status'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -489,7 +489,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['role'] | safe }}">
+                                                        <input class="form-control" name="life_cycle[contribute][role]" type="text" value="{{ learning_object['life_cycle']['contribute']['role'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -512,7 +512,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['entity'] | safe }}">
+                                                        <input class="form-control" name="life_cycle[contribute][entity]" type="text" value="{{ learning_object['life_cycle']['contribute']['entity'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -535,7 +535,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['life_cycle']['contribute']['date'] | safe }}">
+                                                        <input class="form-control" name="life_cycle[contribute][date]" type="text" value="{{ learning_object['life_cycle']['contribute']['date'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -601,12 +601,12 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['identifier'][0] | safe | capitalize }}">
+                                              <input class="form-control" name="meta_metadata[identifier][0]" type="text" value="{{ learning_object['meta_metadata']['identifier'][0] | safe | capitalize }}">
                                             </td>
                                           </tr>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['identifier'][1] | safe | capitalize }}">
+                                              <input class="form-control" name="meta_metadata[identifier][1]" type="text" value="{{ learning_object['meta_metadata']['identifier'][1] | safe | capitalize }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -642,7 +642,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['catalog']['catalog'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[catalog][catalog]" type="text" value="{{ learning_object['meta_metadata']['catalog']['catalog'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -665,7 +665,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['catalog']['entry'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[catalog][entry]" type="text" value="{{ learning_object['meta_metadata']['catalog']['entry'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -707,7 +707,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['role'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[contribute][role]" type="text" value="{{ learning_object['meta_metadata']['contribute']['role'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -730,7 +730,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['entity'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[contribute][entity]" type="text" value="{{ learning_object['meta_metadata']['contribute']['entity'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -753,7 +753,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['contribute']['date'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[contribute][date]" type="text" value="{{ learning_object['meta_metadata']['contribute']['date'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -781,7 +781,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['metadata_scheme'] | safe }}">
+                                              <input class="form-control" name="meta_metadata[metadata_scheme]" type="text" value="{{ learning_object['meta_metadata']['metadata_scheme'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -805,7 +805,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['meta_metadata']['language'] | safe }}">
+                                              <input class="form-control" name="meta_metadata[language]" type="text" value="{{ learning_object['meta_metadata']['language'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -866,7 +866,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['format'] | safe }}">
+                                              <input class="form-control" name="technical[format]" type="text" value="{{ learning_object['technical']['format'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -890,7 +890,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['size'] | safe }}">
+                                              <input class="form-control" name="technical[size]" type="text" value="{{ learning_object['technical']['size'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -914,7 +914,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['location'] | safe }}">
+                                              <input class="form-control" name="technical[location]" type="text" value="{{ learning_object['technical']['location'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -951,7 +951,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['type'] | safe }}">
+                                                        <input class="form-control" name="technical[requirements][type]" type="text" value="{{ learning_object['technical']['requirements']['type'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -974,7 +974,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['name'] | safe }}">
+                                                        <input class="form-control" name="technical[requirements][name]" type="text" value="{{ learning_object['technical']['requirements']['name'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -997,7 +997,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['min_version'] | safe }}">
+                                                        <input class="form-control" name="technical[requirements][min_version]" type="text" value="{{ learning_object['technical']['requirements']['min_version'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1020,7 +1020,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['requirements']['max_version'] | safe }}">
+                                                        <input class="form-control" name="technical[requirements][max_version]" type="text" value="{{ learning_object['technical']['requirements']['max_version'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1049,7 +1049,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['installation_remarks'] | safe }}">
+                                              <input class="form-control" name="technical[installation_remarks]" type="text" value="{{ learning_object['technical']['installation_remarks'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1073,7 +1073,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['other_platform_requirements'] | safe }}">
+                                              <input class="form-control" name="technical[other_platform_requirements]" type="text" value="{{ learning_object['technical']['other_platform_requirements'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1097,7 +1097,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['technical']['duration'] | safe }}">
+                                              <input class="form-control" name="technical[duration]" type="text" value="{{ learning_object['technical']['duration'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1158,7 +1158,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['interactivity_type'] | safe }}">
+                                              <input class="form-control" name="educational[interactivity_type]" type="text" value="{{ learning_object['educational']['interactivity_type'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1182,7 +1182,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['learning_resource_type'] | safe }}">
+                                              <input class="form-control" name="educational[learning_resource_type]" type="text" value="{{ learning_object['educational']['learning_resource_type'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1206,7 +1206,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['interactivity_level'] | safe }}">
+                                              <input class="form-control" name="educational[interactivity_level]" type="text" value="{{ learning_object['educational']['interactivity_level'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1230,7 +1230,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['semantic_density'] | safe }}">
+                                              <input class="form-control" name="educational[semantic_density]" type="text" value="{{ learning_object['educational']['semantic_density'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1254,7 +1254,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['intended_end_user_role'] | safe }}">
+                                              <input class="form-control" name="educational[intended_end_user_role]" type="text" value="{{ learning_object['educational']['intended_end_user_role'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1278,7 +1278,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['context'] | safe }}">
+                                              <input class="form-control" name="educational[context]" type="text" value="{{ learning_object['educational']['context'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1302,7 +1302,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['typical_age_range'] | safe }}">
+                                              <input class="form-control" name="educational[typical_age_range]" type="text" value="{{ learning_object['educational']['typical_age_range'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1326,7 +1326,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['difficulty'] | safe }}">
+                                              <input class="form-control" name="educational[difficulty]" type="text" value="{{ learning_object['educational']['difficulty'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1350,7 +1350,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['typical_learning_time'] | safe }}">
+                                              <input class="form-control" name="educational[typical_learning_time]" type="text" value="{{ learning_object['educational']['typical_learning_time'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1374,7 +1374,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['description'] | safe }}">
+                                              <input class="form-control" name="educational[description]" type="text" value="{{ learning_object['educational']['description'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1398,7 +1398,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['educational']['language'] | safe }}">
+                                              <input class="form-control" name="educational[language]" type="text" value="{{ learning_object['educational']['language'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1459,7 +1459,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['cost'] | safe }}">
+                                              <input class="form-control" name="rights[cost]" type="text" value="{{ learning_object['rights']['cost'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1483,7 +1483,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['copyright_&_other_restrictions'] | safe }}">
+                                              <input class="form-control" name="rights[copyright_&_other_restrictions]" type="text" value="{{ learning_object['rights']['copyright_&_other_restrictions'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1507,7 +1507,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['rights']['description'] | safe }}">
+                                              <input class="form-control" name="rights[description]" type="text" value="{{ learning_object['rights']['description'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1568,7 +1568,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['kind'] | safe }}">
+                                              <input class="form-control" name="relation[kind]" type="text" value="{{ learning_object['relation']['kind'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1605,7 +1605,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['identifier'] | safe }}">
+                                                        <input class="form-control" name="relation[identifier]" type="text" value="{{ learning_object['relation']['identifier'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1628,7 +1628,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['description'] | safe }}">
+                                                        <input class="form-control" name="relation[description]" type="text" value="{{ learning_object['relation']['description'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1651,7 +1651,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['relation']['catalog_entry'] | safe }}">
+                                                        <input class="form-control" name="relation[catalog_entry]" type="text" value="{{ learning_object['relation']['catalog_entry'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1717,7 +1717,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['person'] | safe }}">
+                                              <input class="form-control" name="annotation[person]" type="text" value="{{ learning_object['annotation']['person'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1741,7 +1741,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['date'] | safe }}">
+                                              <input class="form-control" name="annotation[date]" type="text" value="{{ learning_object['annotation']['date'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1765,7 +1765,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['annotation']['description'] | safe }}">
+                                              <input class="form-control" name="annotation[description]" type="text" value="{{ learning_object['annotation']['description'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1826,7 +1826,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['purpose'] | safe }}">
+                                              <input class="form-control" name="classification[purpose]" type="text" value="{{ learning_object['classification']['purpose'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -1863,7 +1863,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['source'] | safe }}">
+                                                        <input class="form-control" name="classification[taxon_path][source]" type="text" value="{{ learning_object['classification']['taxon_path']['source'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1899,7 +1899,7 @@
                                                             <tbody>
                                                               <tr>
                                                                 <td>
-                                                                  <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['id'] | safe }}">
+                                                                  <input class="form-control" name="classification[taxon_path][taxon][id]" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['id'] | safe }}">
                                                                 </td>
                                                               </tr>
                                                             </tbody>
@@ -1922,7 +1922,7 @@
                                                             <tbody>
                                                               <tr>
                                                                 <td>
-                                                                  <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['entry'] | safe }}">
+                                                                  <input class="form-control" name="classification[taxon_path][taxon][entry]" type="text" value="{{ learning_object['classification']['taxon_path']['taxon']['entry'] | safe }}">
                                                                 </td>
                                                               </tr>
                                                             </tbody>
@@ -1969,7 +1969,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['description']['question'] | safe }}">
+                                                        <input class="form-control" name="classification[description][question]" type="text" value="{{ learning_object['classification']['description']['question'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1994,16 +1994,16 @@
                                                       <tr>
                                                         <td>                                                          
                                                           <b>Resposta - {{ loop.index }}</b><br>
-                                                          É a resposta? <input class="form-control col-1" name="classification.answers.is_accepted" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          É a resposta? <input class="form-control col-1" name="classification[description][answers][is_accepted]" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
                                                           Usuário que respondeu:
                                                           <div class="row col-12 align-items-center">
-                                                            <input class="form-control col-1" name="classification.answers.owner.user_id" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="answers.owner.display_name" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                            <input class="form-control col-1" name="classification[description][answers][owner][user_id]" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="answers.owner.display_name" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
                                                           </div>   
-                                                          Likes: <input class="form-control col-1" name="classification.answers.up_vote_count" type="text" value="{{ answer['up_vote_count'] | safe }}">
-                                                          Deslikes: <input class="form-control col-1" name="classification.answers.down_vote_count" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
-                                                          Data da resposta: <input class="form-control col-1" name="classification.answers.creation_date" type="text" value="{{ answer['creation_date'] | safe }}">
-                                                          Data da última alteração: <input class="form-control col-1" name="classification.answers.last_activity_date" type="text" value="{{ answer['last_activity_date'] | safe }}">
-                                                          Corpo da resposta: <textarea class="form-control" name="classification.description.answers.body" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                          Likes: <input class="form-control col-1" name="classification[description][answers][up_vote_count]" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="classification[description][answers][down_vote_count]" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="classification[description][answers][creation_date]" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="classification[description][answers][last_activity_date]" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="classification[description][answers][body]" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
                                                         </td>
                                                       </tr>
                                                     {% endfor %}                                                
@@ -2033,7 +2033,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="preencher" type="text" value="{{ learning_object['classification']['keywords'] | safe }}">
+                                              <input class="form-control" name="classification[keywords]" type="text" value="{{ learning_object['classification']['keywords'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -2065,21 +2065,28 @@
 {% endblock section_content %}
 {% block scripts %}
   {{ super() }}
+    <script src="{{ url_for('static', filename='plugins/jquery/jquery.serializejson.js') }}"></script>
     <script>
-      function save_edit(){
-        $(function(){
-            var value_question = $("#generalDescriptionQuestionDiv").html();
-            document.getElementById("generalDescriptionQuestion").setAttribute('value',value_question);
-        });
-        $(function(){
+      function sendjson(){
 
-            var value_answers = document.getElementsByClassName("general_description_answers_div")
-            for(var i = 0; i < value_answers.length; i++) {
-              document.getElementById("general_description_answers_${i}").setAttribute('value',value_answers[i].innerHTML);
-            }
+        var obj = $('#form').serializeJSON();
+        var jsonString = JSON.stringify(obj);
 
-            $("#edit").submit();
-        });        
+        var url = "{{ url_for('save_edit') }}";
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url);
+
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+              console.log(xhr.status);
+              console.log(xhr.responseText);
+          }};
+
+        xhr.send(jsonString);
       }
     </script>
 {% endblock scripts %}
