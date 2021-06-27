@@ -1,4 +1,5 @@
 #import flask app
+from typing import Mapping
 from flask_wtf import form
 from app import app 
 #import dos metodos do flask
@@ -208,23 +209,39 @@ def view_learning_objects():
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
 @login_required
-@app.route("/view_learning_object/<int:id_learning_object>", methods=['GET', 'POST'])
-def view_learning_object(id_learning_object):
-    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
+@app.route("/view_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+def view_learning_object(id_learning_object_0, id_learning_object_1):
+    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("view_learning_object.html", learning_object=learning_object[0])
 
 @login_required
-@app.route("/edit_learning_object/<int:id_learning_object>", methods=['GET', 'POST'])
-def edit_learning_object(id_learning_object):
-    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object})
+@app.route("/edit_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+def edit_learning_object(id_learning_object_0, id_learning_object_1):
+    learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("edit_learning_object.html", learning_object=learning_object[0])
 
 @login_required
-@app.route("/save_edit/", methods=['GET', 'POST'])
-def save_edit():
-    res = request.get_json()
-    print('\n',json.dumps(res, indent=2),'\n')
-    return redirect(url_for("index"))
+@app.route("/save_edit/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+def save_edit(id_learning_object_0, id_learning_object_1):
+    save_edit_learning_object = request.get_json()
+    if save_edit_learning_object:
+        #print('\n',json.dumps(save_edit_learning_object, indent=2),'\n')
+        learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
+        if learning_object_db:
+            print("encontrei algo")
+            print(type(learning_object_db[0]))
+            #parse_json(learning_object_db[0])
+        database.update("learning_objects", learning_object_db[0], save_edit_learning_object)
+        #print('\n',json.dumps(save_edit_learning_object, indent=2),'\n')
+    return redirect(url_for("view_learning_objects"))
+
+def parse_json(json):
+    for key, value in json:
+        if value is dict:
+            parse_json(value)        
+        else:
+            print(key, value)
+    pass
 
 #### Login, Registro, Perfil e Logout ####
 
@@ -361,12 +378,6 @@ global aux
 aux=1
 @app.route("/test2/", methods=['GET', 'POST'])
 def test2():
-    global aux
-    if request.method == 'POST':
-        res = request.get_json()
-        print(aux)
-        print('\n',res,'\n')
-        aux+=1
-        return redirect(url_for("index"))
-    else:
-        return {"message": "Não enviado, método GET"}
+    res = request.form.getlist("form")
+    print(res)
+    return redirect(url_for("index"))

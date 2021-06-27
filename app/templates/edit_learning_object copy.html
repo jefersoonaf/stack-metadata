@@ -37,7 +37,6 @@
       <div class="container-fluid">
         <form id="form" action="{{ url_for('save_edit', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" method="POST">
           <input type="submit" onclick="sendjson()" value="Salvar"/>
-          <button type="submit">Send It!</button>
           <!-------------------------------------------- General --------------------------------------------->
           <div class="row">
             <div class="col-12">
@@ -142,7 +141,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="general[catalog_entry][catalogue]" data-value-type="string" type="text" value="{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}">
+                                                        <input class="form-control" name="general[catalog_entry][catalogue]" data-value-type="array" type="text" value="{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -256,16 +255,16 @@
                                                       <tr>
                                                         <td>                                                          
                                                           <b>Resposta - {{ loop.index }}</b><br>
-                                                          É a resposta? <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][is_accepted]" data-value-type="boolean" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          É a resposta? <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][is_accepted]" data-value-type="boolean" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
                                                           Usuário que respondeu:
                                                           <div class="row col-12 align-items-center">
-                                                            <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][owner][user_id]" data-value-type="number" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="general[description][answers][{{ loop.index-1 }}][owner][display_name]" data-value-type="string" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                            <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][owner][user_id]" data-value-type="number" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="general[description][answers][{{ loop.index }}][owner][display_name]" data-value-type="string" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
                                                           </div>   
-                                                          Likes: <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][up_vote_count]" data-value-type="number" type="text" value="{{ answer['up_vote_count'] | safe }}">
-                                                          Deslikes: <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][down_vote_count]" data-value-type="number" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
-                                                          Data da resposta: <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][creation_date]" data-value-type="number" type="text" value="{{ answer['creation_date'] | safe }}">
-                                                          Data da última alteração: <input class="form-control col-1" name="general[description][answers][{{ loop.index-1 }}][last_activity_date]" data-value-type="number" type="text" value="{{ answer['last_activity_date'] | safe }}">
-                                                          Corpo da resposta: <textarea class="form-control" name="general[description][answers][{{ loop.index-1 }}][body]" data-value-type="string" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                          Likes: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][up_vote_count]" data-value-type="number" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][down_vote_count]" data-value-type="number" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][creation_date]" data-value-type="number" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="general[description][answers][{{ loop.index }}][last_activity_date]" data-value-type="number" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="general[description][answers][{{ loop.index }}][body]" data-value-type="string" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
                                                         </td>
                                                       </tr>
                                                     {% endfor %}                                                  
@@ -295,7 +294,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="general[keywords]" data-value-type="string" type="text" value="{{ learning_object['general']['keywords'] | safe }}">
+                                              <input class="form-control" name="general[keywords]" data-value-type="array" type="text" value="{{ learning_object['general']['keywords'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -429,7 +428,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="life_cycle[version]" data-value-type="string" type="text" value="{{ learning_object['life_cycle']['version'] | safe }}">
+                                              <input class="form-control" name="live_cycle[version]" data-value-type="string" type="text" value="{{ learning_object['life_cycle']['version'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -643,7 +642,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="meta_metadata[catalog][catalog]" data-value-type="string" type="text" value="{{ learning_object['meta_metadata']['catalog']['catalog'] | safe }}">
+                                                        <input class="form-control" name="meta_metadata[catalog][catalog]" data-value-type="array" type="text" value="{{ learning_object['meta_metadata']['catalog']['catalog'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1995,16 +1994,16 @@
                                                       <tr>
                                                         <td>                                                          
                                                           <b>Resposta - {{ loop.index }}</b><br>
-                                                          É a resposta? <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][is_accepted]" data-value-type="boolean" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
+                                                          É a resposta? <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][is_accepted]" data-value-type="boolean" type="text" value="{{ answer['is_accepted'] | safe }}">                                                         
                                                           Usuário que respondeu:
                                                           <div class="row col-12 align-items-center">
-                                                            <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][owner][user_id]" data-value-type="number" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="classification[description][answers][{{ loop.index-1 }}][display_name]" data-value-type="string" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
+                                                            <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][owner][user_id]" data-value-type="number" type="text" value="{{ answer['owner']['user_id'] | safe }}"> - <input class="form-control col-2" name="classification[description][answers][{{ loop.index }}][display_name]" data-value-type="string" type="text" value="{{ answer['owner']['display_name'] | safe }}"><br>
                                                           </div>   
-                                                          Likes: <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][up_vote_count]" data-value-type="number" type="text" value="{{ answer['up_vote_count'] | safe }}">
-                                                          Deslikes: <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][down_vote_count]" data-value-type="number" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
-                                                          Data da resposta: <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][creation_date]" data-value-type="number" type="text" value="{{ answer['creation_date'] | safe }}">
-                                                          Data da última alteração: <input class="form-control col-1" name="classification[description][answers][{{ loop.index-1 }}][last_activity_date]" data-value-type="number" type="text" value="{{ answer['last_activity_date'] | safe }}">
-                                                          Corpo da resposta: <textarea class="form-control" name="classification[description][answers][{{ loop.index-1 }}][body]" data-value-type="string" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
+                                                          Likes: <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][up_vote_count]" data-value-type="number" type="text" value="{{ answer['up_vote_count'] | safe }}">
+                                                          Deslikes: <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][down_vote_count]" data-value-type="number" type="text" value="{{ answer['down_vote_count'] | safe }}">                                                                                                                                                          
+                                                          Data da resposta: <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][creation_date]" data-value-type="number" type="text" value="{{ answer['creation_date'] | safe }}">
+                                                          Data da última alteração: <input class="form-control col-1" name="classification[description][answers][{{ loop.index }}][last_activity_date]" data-value-type="number" type="text" value="{{ answer['last_activity_date'] | safe }}">
+                                                          Corpo da resposta: <textarea class="form-control" name="classification[description][answers][{{ loop.index }}][body]" data-value-type="string" rows="10">{{ answer['body'] | safe }}</textarea>                                                        
                                                         </td>
                                                       </tr>
                                                     {% endfor %}                                                
@@ -2034,7 +2033,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input class="form-control" name="classification[keywords]" data-value-type="string" type="text" value="{{ learning_object['classification']['keywords'] | safe }}">
+                                              <input class="form-control" name="classification[keywords]" data-value-type="array" type="text" value="{{ learning_object['classification']['keywords'] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>
@@ -2069,7 +2068,7 @@
     <script src="{{ url_for('static', filename='plugins/jquery/jquery.serializejson.js') }}"></script>
     <script>
       function sendjson(){
-        var obj = $('#form').serializeJSON({useIntKeysAsArrayIndex: true, disableColonTypes: true});                                  
+        var obj = $('#form').serializeObject({useIntKeysAsArrayIndex: true, disableColonTypes: true});                                  
         var jsonString = JSON.stringify(obj);
         alert(jsonString)
         var url = "{{ url_for('save_edit', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}";

@@ -28,7 +28,7 @@
 </head>
 <body>
   <script>
-    function sendjson(){
+    function sendjson2(){
 
       var obj = $('#form').serializeJSON();
       var jsonString = JSON.stringify(obj);
@@ -62,34 +62,16 @@
         <h1>Send Me a Message</h1>
         <p>Use this handy contact form to get in touch with me.</p>
         
-        <form id="form" method="post">
-          <div class="input-group">
-            <input id="salutation-mr" name="salutation" type="radio" value="Mr."/>
-            <label class="inline" for="salutation-mr">Mr.</label>
-            
-            <input id="salutation-mrs" name="salutation" type="radio" value="Mrs."/>
-            <label class="inline" for="salutation-mrs">Mrs.</label>
-            
-            <input id="salutation-ms" name="salutation" type="radio" value="Ms."/>
-            <label class="inline" for="salutation-ms">Ms.</label>
-          </div>
+        <form id="form" action="{{ url_for('test2') }}" method="post">
           
           <div class="input-group">
             <label for="name">Full Name</label>
-            <input id="name" name="user[name]" type="text"/>
+            <input id="name" name="form" data-value-type="string" type="text"/>
           </div>
           
           <div class="input-group">
             <label for="email">Email Address</label>
-            <input id="email" name="user[email]" type="email"/>
-          </div>
-          
-          <div class="input-group">
-            <label for="subject">How can I help you?</label>
-            <select id="subject" name="subject">
-              <option>I have a problem.</option>
-              <option>I have a general question.</option>
-            </select>
+            <input id="email" name="form" data-value-type="string" type="email"/>
           </div>
           
           <div class="input-group">
@@ -99,13 +81,13 @@
           
           <div class="input-group">
             <p class="group-label">Please send me:</p>
-            <input id="snacks-pizza" name="snacks" type="checkbox" value="pizza"/>
+            <input id="snacks-pizza" name="snacks" data-value-type="boolean" type="checkbox" value="pizza"/>
             <label class="inline" for="snacks-pizza">Pizza</label>
-            <input id="snacks-cake" name="snacks" type="checkbox" value="cake"/>
+            <input id="snacks-cake" name="snacks" data-value-type="boolean" type="checkbox" value="cake"/>
             <label class="inline" for="snacks-cake">Cake</label>
           </div>
           <div id="general" contenteditable="true">azsfagfagadgagfdsf</div>
-          <input id="secret" name="secret" type="text" value=""/>
+          <input id="secret" name="form" data-value-type="string" type="text" value=""/>
           <button type="submit">Send It!</button>
           <input type="submit" onclick="sendjson()" value="Salvar"/>
         </form>

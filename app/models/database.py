@@ -35,9 +35,9 @@ class Database(object):
     def list(self, collection_name):
         return list(self.database[str(collection_name)].find())
 
-    def update(self, collection_name, instance):
+    def update(self, collection_name, db_instance, instance):
         instance = dict(instance)
-        self.database[str(collection_name)].update_one({"_id": instance["_id"]}, {"$set": instance})
+        self.database[str(collection_name)].update_one({"_id": db_instance["_id"]}, {"$set": instance})
 
     def delete(self, collection_name, instance):
         self.database[str(collection_name)].delete_one({"_id": instance["_id"]})
