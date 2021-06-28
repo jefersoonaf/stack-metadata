@@ -225,23 +225,24 @@ def edit_learning_object(id_learning_object_0, id_learning_object_1):
 def save_edit(id_learning_object_0, id_learning_object_1):
     save_edit_learning_object = request.get_json()
     if save_edit_learning_object:
-        #print('\n',json.dumps(save_edit_learning_object, indent=2),'\n')
         learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
-        if learning_object_db:
-            print("encontrei algo")
-            print(type(learning_object_db[0]))
-            #parse_json(learning_object_db[0])
         database.update("learning_objects", learning_object_db[0], save_edit_learning_object)
         #print('\n',json.dumps(save_edit_learning_object, indent=2),'\n')
     return redirect(url_for("view_learning_objects"))
 
-def parse_json(json):
+@login_required
+@app.route("/delete_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>")
+def delete_learning_object(id_learning_object_0, id_learning_object_1):
+    learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
+    database.delete("learning_objects", learning_object_db[0])
+    return redirect(url_for("view_learning_objects"))
+"""def parse_json(json):
     for key, value in json:
         if value is dict:
             parse_json(value)        
         else:
             print(key, value)
-    pass
+    pass"""
 
 #### Login, Registro, Perfil e Logout ####
 
@@ -345,7 +346,6 @@ def profile():
     else:
         form.name.data = current_user.name
         form.email.data = current_user.email
-        print(form.errors)
     
     return render_template('profile.html', form=form, error=error)
     
