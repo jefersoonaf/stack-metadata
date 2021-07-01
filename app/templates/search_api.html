@@ -39,13 +39,25 @@
           <div class="row">
             <div class="col-md-10 offset-md-1">                        
               <div class="row">                        
-                <div class="col-6">
+                <div class="col-3">
                   <!-- Date -->
                   <div class="form-group">
-                    <label>Data:</label>
-                    <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                      <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" placeholder="dd/mm/aaaa"/>
-                      <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                    <label>Data início:</label>
+                    <div class="input-group date" id="reservationdate_start" data-target-input="nearest">
+                      <input name="date_start" type="text" class="form-control datetimepicker-input" data-target="#reservationdate_start" placeholder="dd/mm/aaaa"/>
+                      <div class="input-group-append" data-target="#reservationdate_start" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <!-- Date -->
+                  <div class="form-group">
+                    <label>Data fim:</label>
+                    <div class="input-group date" id="reservationdate_end" data-target-input="nearest">
+                      <input name="date_end" type="text" class="form-control datetimepicker-input" data-target="#reservationdate_end" placeholder="dd/mm/aaaa"/>
+                      <div class="input-group-append" data-target="#reservationdate_end" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                       </div>
                     </div>
@@ -54,7 +66,7 @@
                 <div class="col-3">
                   <div class="form-group">
                     <label>Ordenar por:</label>
-                    <select name="selected-order" class="form-control" style="width: 100%;">                                        
+                    <select name="selected-sort" class="form-control" style="width: 100%;">                                        
                       <option>Data</option>
                       <option>Votos</option>
                     </select>
@@ -106,7 +118,7 @@
                 <!-- select -->
                 <div class="col-3 form-group">
                   <label>Pesquisar por:</label>
-                  <select name="selected-search" class="form-control">
+                  <select name="selected-type-search" class="form-control">
                     <option>Título da questão</option>
                     <option>Corpo da questão</option>
                     <option>Termo geral</option>
@@ -149,7 +161,10 @@
           tokenSeparators: [',', ';', '.']
         });
         //Date picker
-        $('#reservationdate').datetimepicker({
+        $('#reservationdate_start').datetimepicker({
+          format: 'DD/MM/YYYY'
+        });
+        $('#reservationdate_end').datetimepicker({
           format: 'DD/MM/YYYY'
         });
       });

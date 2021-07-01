@@ -18,7 +18,9 @@ from werkzeug.security import check_password_hash
 #import do controller da api do stackexchange
 from app.controllers.api_stackexchange import StackExchange
 #outros imports
-import json
+import datetime
+import ciso8601
+import time
 
 
 #list_sites = []
@@ -99,17 +101,40 @@ def search_api():
 
 @app.route("/results_search_api/", methods=['POST'])
 @login_required
-def results_search_api():
-    search = request.form.get('search')
+def results_search_api():   
+    global cache_app
     stackexchange = StackExchange(30, 1)
-    
     sites = database.list("sites")
     list_sites_api = []
-    global cache_app
     list_results = []
-    select = request.form.getlist('selected-sites')
-    if select:
-        for option in select:                                       ### criar ium objeto learning object, passar ele para uma variavel e em seguida colocar na lista para mandar para o html
+    
+    #pegar as datas
+    date_start = request.form.get('date_start')
+    date_end = request.form.get('date_end')
+    #pegar as ordenações
+    selected_sort = request.form.get('selected-sort')
+    selected_order = request.form.get('selected-order')
+    #pegar as tags e não tags
+    selected_tagged = request.form.get('selected-tagged')
+    selected_nottagged = request.form.get('selected-nottagged')
+    #pegar os sites
+    selected_sites = request.form.getlist('selected-sites')
+    #pegar o tipo da busca
+    selected_type_search = request.form.getlist('selected-type-search') 
+    #pegar a busca
+    search = request.form.get('search')
+    #date_format = ciso8601.parse_datetime(str(date_start))
+    # to get time in seconds:
+    #print(time.mktime(date_format.timetuple()))
+    print(date_end)
+    print(selected_sort)
+    print(selected_order)
+    print(selected_tagged)
+    print(selected_nottagged)
+    print(selected_type_search)
+    
+    if selected_sites:
+        for option in selected_sites:
             option = option.split("-")[1]
             print(option)
             for site in sites:
@@ -236,13 +261,6 @@ def delete_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     database.delete("learning_objects", learning_object_db[0])
     return redirect(url_for("view_learning_objects"))
-"""def parse_json(json):
-    for key, value in json:
-        if value is dict:
-            parse_json(value)        
-        else:
-            print(key, value)
-    pass"""
 
 #### Login, Registro, Perfil e Logout ####
 
