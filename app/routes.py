@@ -19,8 +19,8 @@ from werkzeug.security import check_password_hash
 from app.controllers.api_stackexchange import StackExchange
 #outros imports
 import datetime
-import ciso8601
 import time
+import pytz
 
 
 #list_sites = []
@@ -109,8 +109,8 @@ def results_search_api():
     list_results = []
     
     #pegar as datas
-    date_start = request.form.get('date_start')
-    date_end = request.form.get('date_end')
+    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
     #pegar as ordenações
     selected_sort = request.form.get('selected-sort')
     selected_order = request.form.get('selected-order')
@@ -126,23 +126,24 @@ def results_search_api():
     #date_format = ciso8601.parse_datetime(str(date_start))
     # to get time in seconds:
     #print(time.mktime(date_format.timetuple()))
+    """print(date_start)
     print(date_end)
     print(selected_sort)
     print(selected_order)
     print(selected_tagged)
     print(selected_nottagged)
-    print(selected_type_search)
+    print(selected_type_search[0])"""
     
     if selected_sites:
         for option in selected_sites:
             option = option.split("-")[1]
-            print(option)
             for site in sites:
                 if option == site["site"]["api_parameter"]:
                     list_sites_api.append(site["site"])
                     break
     for site in list_sites_api:
-        list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]))
+        #list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]))
+        list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]), date_start, date_end, str(selected_sort), str(selected_order), selected_tagged, selected_nottagged, str(selected_type_search[0]))
         list_results.append(list_result_items)
     
     update_results = []

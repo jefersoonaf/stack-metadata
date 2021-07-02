@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
     <!-- Tempusdominus Bootstrap 4 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 {% endblock head %}
 {% block section_content %}
   <!-- Content Wrapper. Contains page content -->
@@ -44,7 +46,7 @@
                   <div class="form-group">
                     <label>Data início:</label>
                     <div class="input-group date" id="reservationdate_start" data-target-input="nearest">
-                      <input name="date_start" type="text" class="form-control datetimepicker-input" data-target="#reservationdate_start" placeholder="dd/mm/aaaa"/>
+                      <input name="date_start" type="text" required="required" class="form-control datetimepicker-input" data-target="#reservationdate_start" placeholder="dd/mm/aaaa"/>
                       <div class="input-group-append" data-target="#reservationdate_start" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                       </div>
@@ -56,7 +58,7 @@
                   <div class="form-group">
                     <label>Data fim:</label>
                     <div class="input-group date" id="reservationdate_end" data-target-input="nearest">
-                      <input name="date_end" type="text" class="form-control datetimepicker-input" data-target="#reservationdate_end" placeholder="dd/mm/aaaa"/>
+                      <input name="date_end" type="text" required="required" class="form-control datetimepicker-input" data-target="#reservationdate_end" placeholder="dd/mm/aaaa"/>
                       <div class="input-group-append" data-target="#reservationdate_end" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                       </div>
@@ -80,10 +82,10 @@
                       <option>Crescente</option>
                     </select>
                   </div>
-                </div>                           
+                </div>                                                                  
               </div>
-              <div class="row">
-                <div class="col-6">
+              <div class="row align-items-end">
+                <div class="col-4">
                   <div class="form-group">
                     <label>Com as tags:</label>
                     <select id="selected-tagged" name="selected-tagged" class="create-tags select2" multiple="multiple" data-placeholder="Nenhuma" style="width: 100%;">
@@ -91,7 +93,7 @@
                     </select>                                    
                   </div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                   <div class="form-group">
                     <label>Sem as tags:</label>
                     <select name="selected-nottagged" class="create-tags select2" multiple="multiple" data-placeholder="Nenhuma" style="width: 100%;">
@@ -99,6 +101,16 @@
                     </select>
                   </div>
                 </div>
+                <div class="col-4 form-group">                  
+                  <div class="form-group clearfix">      
+                    <label>Somente as Respondidas?</label>              
+                    <div class="icheck-success d-inline">
+                      <input type="checkbox" id="checkboxSuccess3">
+                      <label for="checkboxSuccess3">
+                      </label>
+                    </div>
+                  </div>
+                </div> 
               </div>
               <div class="row">
                 <div class="col-12">
@@ -115,7 +127,7 @@
                 </div>
               </div>
               <div class="row align-items-end">
-                <!-- select -->
+                <!-- select -->                
                 <div class="col-3 form-group">
                   <label>Pesquisar por:</label>
                   <select name="selected-type-search" class="form-control">
@@ -123,7 +135,7 @@
                     <option>Corpo da questão</option>
                     <option>Termo geral</option>
                   </select>
-                </div>
+                </div>   
                 <div class="col-9 form-group">
                   <div class="input-group">
                     <input name="search" type="search" class="form-control" placeholder="Digite o que está procurando aqui" aria-label="Search">
