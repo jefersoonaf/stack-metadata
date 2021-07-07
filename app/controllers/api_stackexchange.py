@@ -31,10 +31,12 @@ class StackExchange():
             all_page_items.append(page_items)
         return all_page_items
     
-    def search_advanced(self, search_parameter, site_parameter, date_start_parameter, date_end_parameter, sort_parameter, order_parameter, tagged_parameter, nottagged_parameter, type_search):
+    def search_advanced(self, search_parameter, site_parameter, date_start_parameter, date_end_parameter, sort_parameter, order_parameter, accepted, tagged_parameter, nottagged_parameter, type_search):
         
-        search_url = f"search/advanced?page={self.page}&pagesize={self.page_size}&accepted=True&fromdate={int(date_start_parameter)}&todate={int(date_end_parameter)}"
+        search_url = f"search/advanced?page={self.page}&pagesize={self.page_size}&fromdate={int(date_start_parameter)}&todate={int(date_end_parameter)}"
         
+        if accepted is not None:
+            search_url += f"&accepted=True"
         if sort_parameter == "Data":
             search_url += f"&sort=creation"
         else:

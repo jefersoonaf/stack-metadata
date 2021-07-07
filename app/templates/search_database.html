@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Search Database {% endblock title %}
+{% block title %} StackMetadata | Busca na Base de Dados {% endblock title %}
 {% block head %}
   {{ super() }}
     <!-- Google Font: Source Sans Pro -->
@@ -10,84 +10,185 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='plugins/select2/css/select2.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 {% endblock head %}
 {% block section_content %}
-<div class="wrapper">
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header border-bottom">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Busca na Base de Dados</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active">Busca na Base de Dados</li>
+              </ol>
+            </div>
+          </div>
+      </div><!-- /.container-fluid -->
+    </section>
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
-            <h2 class="text-center display-4">Search Database</h2>
-            <form action="{{ url_for('results_search_database') }}" method="post">
-                <div class="row">
-                    <div class="col-md-10 offset-md-1">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Sites para a busca:</label>
-                                    <select name="multi-select" class="select2" multiple="multiple" data-placeholder="Nenhum" style="width: 100%;">
-                                    {% if sites %}
-                                        {% for site in sites %}
-                                            <option>{{ site['name'] | safe}}-{{ site['api_parameter'] }}</option>
-                                        {% endfor %}
-                                    {% endif %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <label>Sort Order:</label>
-                                    <select class="select2" style="width: 100%;">
-                                        <option selected>ASC</option>
-                                        <option>DESC</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <label>Order By:</label>
-                                    <select class="select2" style="width: 100%;">
-                                        <option selected>Title</option>
-                                        <option>Date</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Título:</label>
-                            <div class="input-group input-group-lg">
-                                <input name="search" type="search" class="form-control form-control-lg" placeholder="Digite o que está procurando aqui" aria-label="Search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-lg btn-default">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+      <div class="container-fluid">
+        <form action="{{ url_for('results_search_api') }}" method="post">
+          <div class="row">
+            <div class="col-md-10 offset-md-1">                        
+              <div class="row">                        
+                <div class="col-3">
+                  <!-- Date -->
+                  <div class="form-group">
+                    <label>Data início:</label>
+                    <div class="input-group date" id="reservationdate_start" data-target-input="nearest">
+                      <input name="date_start" type="text" required="required" class="form-control datetimepicker-input" data-target="#reservationdate_start" placeholder="dd/mm/aaaa"/>
+                      <div class="input-group-append" data-target="#reservationdate_start" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
                     </div>
+                  </div>
                 </div>
-            </form>
-        </div>
+                <div class="col-3">
+                  <!-- Date -->
+                  <div class="form-group">
+                    <label>Data fim:</label>
+                    <div class="input-group date" id="reservationdate_end" data-target-input="nearest">
+                      <input name="date_end" type="text" required="required" class="form-control datetimepicker-input" data-target="#reservationdate_end" placeholder="dd/mm/aaaa"/>
+                      <div class="input-group-append" data-target="#reservationdate_end" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group">
+                    <label>Ordenar por:</label>
+                    <select name="selected-sort" class="form-control" style="width: 100%;">                                        
+                      <option>Data</option>
+                      <option>Votos</option>
+                    </select>
+                  </div>
+                </div>    
+                <div class="col-3">
+                  <div class="form-group">
+                    <label>Ordenar em:</label>
+                    <select name="selected-order" class="form-control" style="width: 100%;">                                        
+                      <option>Decrescente</option>
+                      <option>Crescente</option>
+                    </select>
+                  </div>
+                </div>                                                                  
+              </div>
+              <div class="row align-items-end">
+                <div class="col-4">
+                  <div class="form-group">
+                    <label>Com as tags:</label>
+                    <select id="selected-tagged" name="selected-tagged" class="create-tags select2" multiple="multiple" data-placeholder="Nenhuma" style="width: 100%;">
+                      <option></option>
+                    </select>                                    
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="form-group">
+                    <label>Sem as tags:</label>
+                    <select name="selected-nottagged" class="create-tags select2" multiple="multiple" data-placeholder="Nenhuma" style="width: 100%;">
+                      <option></option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-4 form-group">                  
+                  <div class="form-group clearfix">      
+                    <label>Somente as Respondidas?</label>              
+                    <div class="icheck-success d-inline">
+                      <input name="accepted" type="checkbox" id="checkboxSuccess3">
+                      <label for="checkboxSuccess3">
+                      </label>
+                    </div>
+                  </div>
+                </div> 
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Sites para a busca:</label>
+                    <select name="selected-sites" class="select2" multiple="multiple" data-placeholder="Nenhum" style="width: 100%;">
+                    {% if sites %}
+                      {% for site in sites %}
+                        <option>{{ site['name'] | safe }}-{{ site['api_parameter'] }}</option>
+                      {% endfor %}
+                    {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row align-items-end">
+                <!-- select -->                
+                <div class="col-3 form-group">
+                  <label>Pesquisar por:</label>
+                  <select name="selected-type-search" class="form-control">
+                    <option>Título da questão</option>
+                    <option>Corpo da questão</option>
+                    <option>Termo geral</option>
+                  </select>
+                </div>   
+                <div class="col-9 form-group">
+                  <div class="input-group">
+                    <input name="search" type="search" class="form-control" placeholder="Digite o que está procurando aqui" aria-label="Search">
+                    <div class="input-group-append">
+                      <button type="submit" class="btn btn-default">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>                                                
+            </div>
+          </div>
+        </form>
+      </div>
     </section>
   </div>
-</div>
 {% endblock section_content %}
 {% block scripts %}
-    {{ super() }}
-        <!-- jQuery -->
-        <script src="{{ url_for('static', filename='plugins/jquery/jquery.min.js') }}"></script>
-        <!-- Bootstrap 4 -->
-        <script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-        <!-- Select2 -->
-        <script src="{{ url_for('static', filename='plugins/select2/js/select2.full.min.js') }}"></script>
-        <!-- AdminLTE App -->
-        <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
-        <!-- AdminLTE for demo purposes -->
-        <script src="{{ url_for('static', filename='dist/js/demo.js') }}"></script>
-        <script>
-            $(function () {
-            $('.select2').select2()
-            });
-        </script>
+  {{ super() }}
+    <!-- Select2 -->
+    <script src="{{ url_for('static', filename='plugins/select2/js/select2.full.min.js') }}"></script>
+    <!-- InputMask -->
+    <script src="{{ url_for('static', filename='plugins/moment/moment-with-locales.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+    <script>
+      $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Create tags in select2
+        $(".create-tags").select2({
+          tags: true,
+          tokenSeparators: [',', ';', '.']
+        });
+        //Date picker
+        $('#reservationdate_start').datetimepicker({
+          locale: 'pt-br',
+          format: 'DD/MM/YYYY'
+        });
+        $('#reservationdate_end').datetimepicker({
+          useCurrent: false,
+          locale: 'pt-br',
+          format: 'L'
+        });
+        //Linked Date picker
+        $("#reservationdate_start").on("change.datetimepicker", function (e) {
+            $('#reservationdate_end').datetimepicker('minDate', e.date);
+        });
+        $("#reservationdate_end").on("change.datetimepicker", function (e) {
+            $('#reservationdate_start').datetimepicker('maxDate', e.date);
+        });
+      });
+    </script>
 {% endblock scripts %}

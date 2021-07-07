@@ -119,6 +119,8 @@ def results_search_api():
     selected_nottagged = request.form.get('selected-nottagged')
     #pegar os sites
     selected_sites = request.form.getlist('selected-sites')
+    #pegar seleção de somente perguntas aceitas
+    accepted = request.form.get('accepted')
     #pegar o tipo da busca
     selected_type_search = request.form.getlist('selected-type-search') 
     #pegar a busca
@@ -132,7 +134,8 @@ def results_search_api():
     print(selected_order)
     print(selected_tagged)
     print(selected_nottagged)
-    print(selected_type_search[0])"""
+    print(selected_type_search[0])
+    print(accepted)"""
     
     if selected_sites:
         for option in selected_sites:
@@ -143,7 +146,7 @@ def results_search_api():
                     break
     for site in list_sites_api:
         #list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]))
-        list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]), date_start, date_end, str(selected_sort), str(selected_order), selected_tagged, selected_nottagged, str(selected_type_search[0]))
+        list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]), date_start, date_end, str(selected_sort), str(selected_order), accepted, selected_tagged, selected_nottagged, str(selected_type_search[0]))
         list_results.append(list_result_items)
     
     update_results = []
@@ -222,7 +225,22 @@ def search_database():
 
 @app.route("/results_search_database/")
 def results_search_database():
-    
+    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    #pegar as ordenações
+    selected_sort = request.form.get('selected-sort')
+    selected_order = request.form.get('selected-order')
+    #pegar as tags e não tags
+    selected_tagged = request.form.get('selected-tagged')
+    selected_nottagged = request.form.get('selected-nottagged')
+    #pegar os sites
+    selected_sites = request.form.getlist('selected-sites')
+    #pegar seleção de somente perguntas aceitas
+    accepted = request.form.get('accepted')
+    #pegar o tipo da busca
+    selected_type_search = request.form.getlist('selected-type-search') 
+    #pegar a busca
+    search = request.form.get('search')
     pass
 
 @login_required
@@ -387,12 +405,7 @@ def errorPage(e):
 
 @app.route("/test/", methods=['GET', 'POST'])
 def test():
-    res = request.get_json()
-    if res:
-        print('\n',res,'\n')
-        return redirect(url_for("index"))
-    else:
-        return render_template("test.html")
+    return render_template("advanced.html")
 global aux
 aux=1
 @app.route("/test2/", methods=['GET', 'POST'])

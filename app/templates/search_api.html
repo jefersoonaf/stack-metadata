@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Search API {% endblock title %}
+{% block title %} StackMetadata | Busca na API {% endblock title %}
 {% block head %}
   {{ super() }}
     <!-- Google Font: Source Sans Pro -->
@@ -23,12 +23,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Search API</h1>
+            <h1>Busca na API</h1>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-                <li class="breadcrumb-item active">Search API</li>
+                <li class="breadcrumb-item active">Busca na API</li>
               </ol>
             </div>
           </div>
@@ -105,7 +105,7 @@
                   <div class="form-group clearfix">      
                     <label>Somente as Respondidas?</label>              
                     <div class="icheck-success d-inline">
-                      <input type="checkbox" id="checkboxSuccess3">
+                      <input name="accepted" type="checkbox" id="checkboxSuccess3">
                       <label for="checkboxSuccess3">
                       </label>
                     </div>
@@ -159,7 +159,7 @@
     <!-- Select2 -->
     <script src="{{ url_for('static', filename='plugins/select2/js/select2.full.min.js') }}"></script>
     <!-- InputMask -->
-    <script src="{{ url_for('static', filename='plugins/moment/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/moment/moment-with-locales.min.js') }}"></script>
     <script src="{{ url_for('static', filename='plugins/inputmask/jquery.inputmask.min.js') }}"></script>
     <!-- Tempusdominus Bootstrap 4 -->
     <script src="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
@@ -174,10 +174,20 @@
         });
         //Date picker
         $('#reservationdate_start').datetimepicker({
+          locale: 'pt-br',
           format: 'DD/MM/YYYY'
         });
         $('#reservationdate_end').datetimepicker({
-          format: 'DD/MM/YYYY'
+          useCurrent: false,
+          locale: 'pt-br',
+          format: 'L'
+        });
+        //Linked Date picker
+        $("#reservationdate_start").on("change.datetimepicker", function (e) {
+            $('#reservationdate_end').datetimepicker('minDate', e.date);
+        });
+        $("#reservationdate_end").on("change.datetimepicker", function (e) {
+            $('#reservationdate_start').datetimepicker('maxDate', e.date);
         });
       });
     </script>
