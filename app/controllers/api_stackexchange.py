@@ -25,7 +25,7 @@ class StackExchange():
         all_page_items.append(page_items)
         while page_items["has_more"] == True and self.page < self.max_pages: #loop para pegar todos os itens da resposta, serve para respostam que tem mais de uma pagina
             self.page += 1
-            self.current_url = self.format_url(f"sites?page={self.page}&pagesize={self.page_size}&filter=!)5Go40vq3hW-*WORcvj5wWMiOVbI")
+            self.format_url(f"sites?page={self.page}&pagesize={self.page_size}&filter=!)5Go40vq3hW-*WORcvj5wWMiOVbI")
             response = requests.get(self.current_url)
             page_items = response.json()
             all_page_items.append(page_items)

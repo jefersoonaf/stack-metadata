@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, SelectField, PasswordField, SubmitField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 class LoginForm(FlaskForm): 
@@ -21,3 +21,11 @@ class ProfileForm(FlaskForm):
     current_password = PasswordField("Senha Atual", validators=[DataRequired()])
     new_password = PasswordField("Nova Senha", validators=[DataRequired()])
     repeat_new_password = PasswordField("Confirme a nova senha", validators=[DataRequired(), EqualTo('new_password')])
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Solicitar nova senha')
+    
+class VerifyCodeForgotPasswordForm(FlaskForm):
+    code = StringField('Código', validators=[DataRequired()])
+    submit = SubmitField('Verificar')

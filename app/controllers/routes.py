@@ -1,7 +1,7 @@
 #import flask app
 from typing import Mapping
 from flask_wtf import form
-from app import app 
+from app import app, mail
 #import dos metodos do flask
 from flask import Flask, request, render_template, url_for, redirect, flash
 #import do objeto do banco de dados
@@ -11,7 +11,7 @@ from app.models.learning_object import LearningObject
 from app.models.site import Site
 from app.models.user import User
 #import dos formulários
-from app.models.forms import LoginForm, RegisterForm, ProfileForm
+from app.models.forms import LoginForm, RegisterForm, ProfileForm, ForgotPasswordForm, VerifyCodeForgotPasswordForm
 #import do contralador de seção do usuário e verificação de senha
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
@@ -21,10 +21,13 @@ from app.controllers.api_stackexchange import StackExchange
 import datetime
 import time
 import pytz
+import random
+from flask_mail import Message
 
 
 #list_sites = []
 cache_app = []
+
 #### ROTAS DA APLICAÇÃO ####
 
 #### home ####
@@ -59,12 +62,11 @@ def search_sites():
                 site_json = site_object.get_as_json()
                 for site_database in sites_database:
                     if site_json["site"]["api_parameter"] == site_database["site"]["api_parameter"]:
-                        site_update = {**site_database, **site_json}
+                        #site_update = {**site_database, **site_json}
+                        site_update = site_json
+                        database.update("sites", site_database, site_update)       
                         break
-                if site_update != None or "":
-                    database.update("sites", site_update)
-                    break
-                else:
+                if site_update == None or "":
                     database.create("sites", site_object)
                     break
     else:
@@ -214,7 +216,6 @@ def save_search(index_list_results, index_result, name_site, api_site):
         database.update("learning_objects", item_db[0])
         return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
 
-
 @app.route("/search_database/")
 def search_database():
     sites = database.list("sites")
@@ -325,7 +326,7 @@ def login():
                     flash('Problema com o login. Por favor verifique seu email e senha.', 'danger')
         return render_template('login.html', form=form)
     else:
-        return redirect(url_for("login"))
+        return redirect(url_for("index"))
 
 #Logout
 @app.route("/logout/", methods=['GET', 'POST'])
@@ -385,7 +386,75 @@ def profile():
         form.email.data = current_user.email
     
     return render_template('profile.html', form=form, error=error)
+
+#ForgotPassword
+@app.route("/forgot_password/", methods=['GET', 'POST'])
+def forgot_password():
+    if not current_user.is_authenticated:
+        form = ForgotPasswordForm()
+        if form.validate_on_submit():
+            return redirect(url_for("send_code_mail", email=form.email.data))
+        else:
+            return render_template('forgot_password.html', form=form)
+    else:
+        return redirect(url_for("login"))
     
+
+        
+#### Envio de email ####
+@app.route("/send_code_mail/<string:email>")
+def send_code_mail(email):
+    if not current_user.is_authenticated:
+        query = database.filter_by('users', {"email": email})
+        if query:
+            user_bd = query[0] #tenho que salvar no banco uma chave para o codigo temporário de recuperação de senha
+            number = range(0, 9)
+            code_temp = ''
+            for i in range(6):
+                code_temp += str(random.choice(number))
+            
+            msg = Message(
+                'Código para recuperação de senha!',
+                recipients=['jefersonpks@gmail.com'],
+            )
+            msg.html = f"""  
+                <div class="text-align:center">
+                    <p>
+                        <h2>Para resuperar a sua senha use o código:<h2>
+                    </p>
+                    <table style="border:1px solid #4400ff;margin-top:10px" border="0" width="200" cellspacing="0" cellpadding="0" align="center">
+                        <tbody>
+                            <tr>
+                                <td height="60">
+                                    <p style="font-family:'Lato',Calibri,Arial,sans-serif;font-size:22px;color:#4400ff;text-align:center">
+                                        <strong>
+                                            {code_temp}
+                                        </strong>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            """
+            mail.send(msg)
+            return redirect(url_for("verify_code_forgot_password", email=email))
+        else:
+            return redirect(url_for("register"))
+    else:
+        return redirect(url_for("index"))
+
+@app.route("/verify_code_forgot_password/<string:email>")
+def verify_code_forgot_password(email):
+    if not current_user.is_authenticated:
+        form = VerifyCodeForgotPasswordForm()
+        if form.validate_on_submit():
+            return redirect(url_for("send_code_mail", email=form.email.data))#tenho que colocar a verificação aqui
+        else:
+            return render_template('verify_code_forgot_password.html', form=form, email=email)
+    else:
+        return redirect(url_for("index"))
+
 #### tratamento de exceções nas rotas ####
 
 @app.errorhandler(404)
