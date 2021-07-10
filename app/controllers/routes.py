@@ -1,6 +1,7 @@
 #import flask app
+from functools import cache
 from typing import Mapping
-from flask_wtf import form
+from flask_wtf import Form
 from app import app, mail
 #import dos metodos do flask
 from flask import Flask, request, render_template, url_for, redirect, flash
@@ -11,7 +12,7 @@ from app.models.learning_object import LearningObject
 from app.models.site import Site
 from app.models.user import User
 #import dos formulários
-from app.models.forms import LoginForm, RegisterForm, ProfileForm, ForgotPasswordForm, VerifyCodeForgotPasswordForm
+from app.models.forms import LoginForm, RegisterForm, ProfileForm, ForgotPasswordForm, VerifyCodeForgotPasswordForm, ChangePasswordForm
 #import do contralador de seção do usuário e verificação de senha
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
@@ -23,10 +24,15 @@ import time
 import pytz
 import random
 from flask_mail import Message
+import secrets
 
+#### Cache do sistema ####
 
-#list_sites = []
-cache_app = []
+#lista para gestão do cache antes do login do usuário
+cache_app_before_login = []
+
+#lista para gestão do cache depois do login do usuário
+cache_app_after_login = []
 
 #### ROTAS DA APLICAÇÃO ####
 
@@ -104,7 +110,7 @@ def search_api():
 @app.route("/results_search_api/", methods=['POST'])
 @login_required
 def results_search_api():   
-    global cache_app
+    global cache_app_after_login
     stackexchange = StackExchange(30, 1)
     sites = database.list("sites")
     list_sites_api = []
@@ -164,9 +170,9 @@ def results_search_api():
         update = []
     
     cache_user = []
-    for x in range(len(cache_app)):
-        if current_user.email == cache_app[x][0]:              
-            cache_user = cache_app[x]
+    for x in range(len(cache_app_after_login)):
+        if current_user.email == cache_app_after_login[x][0]:              
+            cache_user = cache_app_after_login[x]
             break        
     if cache_user:
         cache_user[1] = list_results
@@ -177,7 +183,7 @@ def results_search_api():
         cache_user.append(list_results)
         cache_user.append(list_sites_api)
         cache_user.append(update_results)
-        cache_app.append(cache_user)
+        cache_app_after_login.append(cache_user)
     
     return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
 
@@ -188,11 +194,11 @@ def save_search(index_list_results, index_result, name_site, api_site):
     list_sites_api = []
     update_results = []
     cache_user = []
-    global cache_app
+    global cache_app_after_login
     user = None
-    for x in range(len(cache_app)):
-        if current_user.email == cache_app[x][0]:              
-            cache_user = cache_app[x]
+    for x in range(len(cache_app_after_login)):
+        if current_user.email == cache_app_after_login[x][0]:              
+            cache_user = cache_app_after_login[x]
             user = x
             break  
     if cache_user:                                
@@ -209,7 +215,7 @@ def save_search(index_list_results, index_result, name_site, api_site):
         database.create("learning_objects", learning_object)
         update_results[index_list_results][index_result] = 1
         cache_user[3] = update_results
-        cache_app[user] = cache_user
+        cache_app_after_login[user] = cache_user
         return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
     else:
         print("update")
@@ -332,10 +338,10 @@ def login():
 @app.route("/logout/", methods=['GET', 'POST'])
 @login_required
 def logout():
-    global cache_app
-    for x in range(len(cache_app)):
-        if current_user.email == cache_app[x][0]:              
-            cache_app.pop(x)
+    global cache_app_after_login
+    for x in range(len(cache_app_after_login)):
+        if current_user.email == cache_app_after_login[x][0]:              
+            cache_app_after_login.pop(x)
             break
     logout_user()
     return redirect(url_for("login"))
@@ -393,6 +399,7 @@ def forgot_password():
     if not current_user.is_authenticated:
         form = ForgotPasswordForm()
         if form.validate_on_submit():
+            
             return redirect(url_for("send_code_mail", email=form.email.data))
         else:
             return render_template('forgot_password.html', form=form)
@@ -402,16 +409,38 @@ def forgot_password():
 
         
 #### Envio de email ####
-@app.route("/send_code_mail/<string:email>")
+@app.route("/send_code_mail/<string:email>", methods=['GET', 'POST'])
 def send_code_mail(email):
     if not current_user.is_authenticated:
+        global cache_app_before_login
         query = database.filter_by('users', {"email": email})
         if query:
-            user_bd = query[0] #tenho que salvar no banco uma chave para o codigo temporário de recuperação de senha
+            user_bd = query[0] 
+            
+            #gera codigo temporário para recuperar a senha
             number = range(0, 9)
             code_temp = ''
             for i in range(6):
                 code_temp += str(random.choice(number))
+            
+            #gerando hash de segurança do link de recuperação
+            token_temp = secrets.token_hex(64)
+                        
+            #gestão do cache
+            cache_user_temp = [] 
+            for x in range(len(cache_app_before_login)):
+                if user_bd['email'] == cache_app_before_login[x][0]:              
+                    cache_user_temp = cache_app_before_login[x]
+                    break        
+            if cache_user_temp:
+                cache_user_temp[0] = user_bd
+                cache_user_temp[1] = int(code_temp)
+                cache_user_temp[2] = str(token_temp)
+            else:
+                cache_user_temp.append(user_bd)
+                cache_user_temp.append(int(code_temp))
+                cache_user_temp.append(str(token_temp))
+                cache_app_before_login.append(cache_user_temp)
             
             msg = Message(
                 'Código para recuperação de senha!',
@@ -438,20 +467,58 @@ def send_code_mail(email):
                 </div>
             """
             mail.send(msg)
-            return redirect(url_for("verify_code_forgot_password", email=email))
+            return redirect(url_for("verify_code_forgot_password", email=email, token=token_temp))
         else:
             return redirect(url_for("register"))
     else:
         return redirect(url_for("index"))
 
-@app.route("/verify_code_forgot_password/<string:email>")
-def verify_code_forgot_password(email):
+
+@app.route("/verify_code_forgot_password/<string:email>/<string:token>/", methods=['GET', 'POST'])
+def verify_code_forgot_password(email, token):#verificar se codigo esta no cache e se esta dentro do tempo permitido, se não estiver lançar uma mensagem de errr dizendo que o codigo não existe ou expirou
+    global cache_app_before_login
     if not current_user.is_authenticated:
+        verified = False
         form = VerifyCodeForgotPasswordForm()
         if form.validate_on_submit():
-            return redirect(url_for("send_code_mail", email=form.email.data))#tenho que colocar a verificação aqui
+            for x in range(len(cache_app_before_login)):
+                print(email==cache_app_before_login[x][0]['email'])
+                print(type(form.code.data))
+                print(type(cache_app_before_login[x][1]))
+                print(token==cache_app_before_login[x][2])
+                if email == cache_app_before_login[x][0]['email'] and form.code.data == cache_app_before_login[x][1] and token == cache_app_before_login[x][2]: #verifica se o tken passado no link é o mesmo que foi gerado pelo sistema        
+                    verified = True
+                    break
+            if verified:
+                return redirect(url_for("change_password", email=email, token=token))
+            else:
+                return render_template('verify_code_forgot_password.html', form=form, email=email)
         else:
             return render_template('verify_code_forgot_password.html', form=form, email=email)
+    else:
+        return redirect(url_for("index"))
+
+
+@app.route("/change_password/<string:email>/<string:token>/", methods=['GET', 'POST'])
+def change_password(email, token):
+    global cache_app_before_login
+    if not current_user.is_authenticated:
+        form = ChangePasswordForm()
+        if form.validate_on_submit():
+            for x in range(len(cache_app_before_login)):
+                if email == cache_app_before_login[x][0]['email'] and token == cache_app_before_login[x][2]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema                    
+                    new_password = form.new_password.data
+                    user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password)
+                    new_password = form.new_password.data
+                    database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
+                    cache_app_before_login.pop(x)
+                    break
+            if True:
+                return redirect(url_for("change_password", token=token))
+            else:
+                return render_template('verify_code_forgot_password.html', form=form, email=email)
+        else:
+            return render_template('change_password.html', form=form)
     else:
         return redirect(url_for("index"))
 
