@@ -1,10 +1,7 @@
 #import flask app
-from functools import cache
-from typing import Mapping
-from flask_wtf import Form
 from app import app, mail
 #import dos metodos do flask
-from flask import Flask, request, render_template, url_for, redirect, flash
+from flask import request, render_template, url_for, redirect, flash, abort
 #import do objeto do banco de dados
 from app import database
 #import das coleções do banco de dados
@@ -18,25 +15,27 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 #import do controller da api do stackexchange
 from app.controllers.api_stackexchange import StackExchange
+#import message para envio do email
+from flask_mail import Message
+#import do gerador de hash base64
+import secrets
 #outros imports
 import datetime
-import time
 import pytz
 import random
-from flask_mail import Message
-import secrets
 
-#### Cache do sistema ####
 
-#lista para gestão do cache antes do login do usuário
+#### CACHE DA APLICAÇÃO ####
+
+#Lista para gestão do cache antes do login do usuário
 cache_app_before_login = []
 
-#lista para gestão do cache depois do login do usuário
+#Lista para gestão do cache depois do login do usuário
 cache_app_after_login = []
 
 #### ROTAS DA APLICAÇÃO ####
 
-#### home ####
+#### Tela principal do sistema ####
 
 @app.route("/")
 @app.route("/index/")
@@ -53,8 +52,9 @@ def index():
         number_learning_objects = 0
     return render_template("index.html", number_sites=number_sites, number_learning_objects=number_learning_objects)
 
-#### sites ####
+#### Pesquisa e Atulização dos sites disponiveis para a busca na api ####
 
+#Pesquisa/atualização de sites disponiveis para busca na api
 @app.route("/search_sites/", methods=['GET'])
 @login_required
 def search_sites():
@@ -85,6 +85,7 @@ def search_sites():
                     continue
     return redirect(url_for('view_sites'))
 
+#Visualização dos sites
 @app.route("/view_sites/", methods=['GET'])
 @login_required
 def view_sites():
@@ -95,8 +96,9 @@ def view_sites():
     return render_template("view_sites.html", sites=list_sites)
 
 
-#### learning_object ####
+#### Pesquisa e CRUD de objetos de aprendizagens ####
 
+#Pesquisa de objetos de aprendizagens na api
 @app.route("/search_api/", methods=['GET'])
 @login_required
 def search_api():
@@ -107,6 +109,7 @@ def search_api():
         list_sites.append(site["site"])
     return render_template("search_api.html", sites=list_sites)
 
+#Apresenta os resultados da pesquisa na api
 @app.route("/results_search_api/", methods=['POST'])
 @login_required
 def results_search_api():   
@@ -187,9 +190,10 @@ def results_search_api():
     
     return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
 
-@app.route("/save_search/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
+#Cria um novo objeto de aprendizagem a partir da pesquisa retornada na api
+@app.route("/create_learning_object/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
 @login_required
-def save_search(index_list_results, index_result, name_site, api_site):
+def create_learning_object(index_list_results, index_result, name_site, api_site):
     list_results = []
     list_sites_api = []
     update_results = []
@@ -222,6 +226,7 @@ def save_search(index_list_results, index_result, name_site, api_site):
         database.update("learning_objects", item_db[0])
         return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
 
+#Pesquisa de objetos de aprendizagens no banco de dados
 @app.route("/search_database/")
 def search_database():
     sites = database.list("sites")
@@ -230,6 +235,7 @@ def search_database():
         list_sites.append(site["site"])
     return render_template("search_database.html", sites=list_sites)
 
+#Apresenta os resultados da pesquisa no banco de dados
 @app.route("/results_search_database/")
 def results_search_database():
     date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
@@ -250,6 +256,7 @@ def results_search_database():
     search = request.form.get('search')
     pass
 
+#Visualiza os objetos de aprendizagens que estão no banco de dados
 @login_required
 @app.route("/view_learning_objects/")
 def view_learning_objects():
@@ -259,21 +266,24 @@ def view_learning_objects():
         list_learning_objects.append(learning_object)
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
+#Visualiza o objeto de aprendizagem
 @login_required
 @app.route("/view_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
 def view_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("view_learning_object.html", learning_object=learning_object[0])
 
+#Edita o objeto de aprendizagem
 @login_required
 @app.route("/edit_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
 def edit_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("edit_learning_object.html", learning_object=learning_object[0])
 
+#Atualiza o objeto de aprendizagem que foi editado
 @login_required
-@app.route("/save_edit/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
-def save_edit(id_learning_object_0, id_learning_object_1):
+@app.route("/update_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+def update_learning_object(id_learning_object_0, id_learning_object_1):
     save_edit_learning_object = request.get_json()
     if save_edit_learning_object:
         learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
@@ -281,6 +291,7 @@ def save_edit(id_learning_object_0, id_learning_object_1):
         #print('\n',json.dumps(save_edit_learning_object, indent=2),'\n')
     return redirect(url_for("view_learning_objects"))
 
+#Deleta o objeto de aprendizagem
 @login_required
 @app.route("/delete_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>")
 def delete_learning_object(id_learning_object_0, id_learning_object_1):
@@ -288,9 +299,10 @@ def delete_learning_object(id_learning_object_0, id_learning_object_1):
     database.delete("learning_objects", learning_object_db[0])
     return redirect(url_for("view_learning_objects"))
 
-#### Login, Registro, Perfil e Logout ####
 
-#Criar Conta
+#### Login, Registro, Perfil, Logout e Recuperação de senha ####
+
+#Registro de conta
 @app.route("/register/", methods=['GET', 'POST'])
 def register():
     if not current_user.is_authenticated:
@@ -311,7 +323,7 @@ def register():
     else:
         return redirect(url_for("index"))
 
-#Login
+#Login - Entrar no sistema
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
     if not current_user.is_authenticated:
@@ -334,7 +346,7 @@ def login():
     else:
         return redirect(url_for("index"))
 
-#Logout
+#Logout - Sair do sistema
 @app.route("/logout/", methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -346,187 +358,234 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-#Profile
+#Perfil do usuário
 @app.route("/profile/", methods=['GET', 'POST'])
 @login_required
 def profile():
+    msg_dialog = None
+    type_dialog = None
     form = ProfileForm()
-    error = None
     if form.validate_on_submit():
         name = form.name.data
-        email = form.email.data
         current_password = form.current_password.data
         new_password = form.new_password.data
-        repeat_new_password = form.repeat_new_password.data
-        # Saber se email é o mesmo
-        query = database.filter_by('users', {"email": email})
+        confirm_new_password = form.confirm_new_password.data
+        #busca dados do usuário no banco
+        query = database.filter_by('users', {"email": current_user.email})
         if query:
             user_bd = query[0]
-            is_email_used = True
-            is_email_same = (user_bd['email'] == current_user.email)
-        else:
-            is_email_used = False
-            is_email_same = False
-        if not is_email_used or is_email_same:
-            #verificar se a senha atual é igual
-            user_bd = database.filter_by('users', {"email": current_user.email})
-            user_bd = user_bd[0]
-            is_pass_ok = check_password_hash(user_bd['password'], current_password)
-            if is_pass_ok:
-                if new_password == repeat_new_password:
-                    user_bd['name'] = name
-                    user_bd['password'] = new_password
-                    user_bd['email'] = email
-
-                    
-                    database.update("users", user_bd)
-                    return redirect(url_for("index"))
+            #verificar se a senha atual é igual a sanha no banco de dados
+            if check_password_hash(user_bd['password'], current_password):       
+                if new_password == confirm_new_password:
+                    user_temp = User(name, current_user.email, new_password)
+                    database.update("users", user_bd, user_temp.get_as_json())
+                    msg_dialog = "Dados do perfil alterados com sucesso!"
+                    type_dialog = "dafault"
+                    form.name.data = name
+                    return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
                 else:
-                    error = 3 # Nova Senha Não coincide
+                    msg_dialog = "A confirmação de senha está incorreta!"
+                    type_dialog = "danger"
+                    return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
             else:
-                error = 2 #Senha atual está errada
+                msg_dialog = "A senha atual informada está incorreta!"
+                type_dialog = "danger"
+                return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
         else:
-            error = 1 #Email está em uso e não é o mesmo
+            abort(500)
     else:
         form.name.data = current_user.name
-        form.email.data = current_user.email
-    
-    return render_template('profile.html', form=form, error=error)
+        return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
 
-#ForgotPassword
+#Recuperação de senha
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def forgot_password():
     if not current_user.is_authenticated:
+        global cache_app_before_login
         form = ForgotPasswordForm()
         if form.validate_on_submit():
-            
-            return redirect(url_for("send_code_mail", email=form.email.data))
+            query = database.filter_by('users', {"email": form.email.data})
+            if query:
+                user_bd = query[0] 
+                
+                #gera codigo temporário para recuperar a senha
+                number = range(0, 9)
+                code_temp = ''
+                for i in range(6):
+                    code_temp += str(random.choice(number))
+                
+                #gerando hash de segurança do link de recuperação
+                token_temp = secrets.token_hex(64)
+                
+                #gera validade do codigo e do token
+                validate_temp = int(datetime.datetime.now().replace(tzinfo=pytz.utc).timestamp()+3600) #soma 3600 segundos ao tempo de validade para ser valido por 1 hora
+                        
+                #gestão do cache
+                cache_user_temp = [] 
+                for x in range(len(cache_app_before_login)):
+                    if user_bd['email'] == cache_app_before_login[x][0]:              
+                        cache_user_temp = cache_app_before_login[x]
+                        break        
+                if cache_user_temp:
+                    cache_user_temp[0] = user_bd
+                    cache_user_temp[1] = int(code_temp)
+                    cache_user_temp[2] = str(token_temp)
+                    cache_user_temp[3] = int(validate_temp)
+                else:
+                    cache_user_temp.append(user_bd)
+                    cache_user_temp.append(int(code_temp))
+                    cache_user_temp.append(str(token_temp))
+                    cache_user_temp.append(int(validate_temp))
+                    cache_app_before_login.append(cache_user_temp)
+                
+                #envio do email com o código
+                msg = Message(
+                    'Código para recuperação de senha!',
+                    recipients=[form.email.data],
+                )
+                msg.html = f"""  
+                    <div width="100%" style="margin:0;padding:0!important">
+                        <center style="width:100%;>
+                            <div style="max-width:600px;margin:0 auto" class="m_-2585479850499807075email-container">
+                                <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                                    <tbody>
+                                        <tr>
+                                            <td height="20"></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center">
+                                                <p style="line-height:1.5;font-family:'Lato',Calibri,Arial,sans-serif;font-size:18px;color:#000000;text-align:center;text-decoration:none"> 
+                                                    Para resuperar a sua senha use o código abaixo:
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table style="border:1px solid #4400ff;margin-top:10px" border="0" width="200" cellspacing="0" cellpadding="0" align="center">
+                                    <tbody>
+                                        <tr>
+                                            <td height="60">
+                                                <p style="font-family:'Lato',Calibri,Arial,sans-serif;font-size:22px;color:#4400ff;text-align:center">
+                                                    <strong>
+                                                        {code_temp}
+                                                    </strong>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                                    <tbody>
+                                        <tr>
+                                            <td height="20"></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center">
+                                                <p style="line-height:1.5;font-family:'Lato',Calibri,Arial,sans-serif;font-size:12px;color:#000000;text-align:center;text-decoration:none"> 
+                                                    Este código é válido por 1 hora.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </center>
+                        <div class="yj6qo"></div>
+                        <div class="adL"></div>
+                    </div>
+                """
+                mail.send(msg)
+                return redirect(url_for("verify_code_forgot_password", token=token_temp))
+            else:
+                return redirect(url_for("register"))
         else:
             return render_template('forgot_password.html', form=form)
     else:
-        return redirect(url_for("login"))
+        return redirect(url_for("index"))
     
-
-        
-#### Envio de email ####
-@app.route("/send_code_mail/<string:email>", methods=['GET', 'POST'])
-def send_code_mail(email):
+#Verifica código enviado da recuperação de senha
+@app.route("/verify_code_forgot_password/<string:token>/", methods=['GET', 'POST'])
+def verify_code_forgot_password(token):#verificar se codigo esta no cache e se esta dentro do tempo permitido, se não estiver lançar uma mensagem de errr dizendo que o codigo não existe ou expirou
     if not current_user.is_authenticated:
         global cache_app_before_login
-        query = database.filter_by('users', {"email": email})
-        if query:
-            user_bd = query[0] 
-            
-            #gera codigo temporário para recuperar a senha
-            number = range(0, 9)
-            code_temp = ''
-            for i in range(6):
-                code_temp += str(random.choice(number))
-            
-            #gerando hash de segurança do link de recuperação
-            token_temp = secrets.token_hex(64)
-                        
-            #gestão do cache
-            cache_user_temp = [] 
-            for x in range(len(cache_app_before_login)):
-                if user_bd['email'] == cache_app_before_login[x][0]:              
-                    cache_user_temp = cache_app_before_login[x]
-                    break        
-            if cache_user_temp:
-                cache_user_temp[0] = user_bd
-                cache_user_temp[1] = int(code_temp)
-                cache_user_temp[2] = str(token_temp)
-            else:
-                cache_user_temp.append(user_bd)
-                cache_user_temp.append(int(code_temp))
-                cache_user_temp.append(str(token_temp))
-                cache_app_before_login.append(cache_user_temp)
-            
-            msg = Message(
-                'Código para recuperação de senha!',
-                recipients=['jefersonpks@gmail.com'],
-            )
-            msg.html = f"""  
-                <div class="text-align:center">
-                    <p>
-                        <h2>Para resuperar a sua senha use o código:<h2>
-                    </p>
-                    <table style="border:1px solid #4400ff;margin-top:10px" border="0" width="200" cellspacing="0" cellpadding="0" align="center">
-                        <tbody>
-                            <tr>
-                                <td height="60">
-                                    <p style="font-family:'Lato',Calibri,Arial,sans-serif;font-size:22px;color:#4400ff;text-align:center">
-                                        <strong>
-                                            {code_temp}
-                                        </strong>
-                                    </p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            """
-            mail.send(msg)
-            return redirect(url_for("verify_code_forgot_password", email=email, token=token_temp))
-        else:
-            return redirect(url_for("register"))
-    else:
-        return redirect(url_for("index"))
-
-
-@app.route("/verify_code_forgot_password/<string:email>/<string:token>/", methods=['GET', 'POST'])
-def verify_code_forgot_password(email, token):#verificar se codigo esta no cache e se esta dentro do tempo permitido, se não estiver lançar uma mensagem de errr dizendo que o codigo não existe ou expirou
-    global cache_app_before_login
-    if not current_user.is_authenticated:
-        verified = False
-        form = VerifyCodeForgotPasswordForm()
-        if form.validate_on_submit():
-            for x in range(len(cache_app_before_login)):
-                print(email==cache_app_before_login[x][0]['email'])
-                print(type(form.code.data))
-                print(type(cache_app_before_login[x][1]))
-                print(token==cache_app_before_login[x][2])
-                if email == cache_app_before_login[x][0]['email'] and form.code.data == cache_app_before_login[x][1] and token == cache_app_before_login[x][2]: #verifica se o tken passado no link é o mesmo que foi gerado pelo sistema        
-                    verified = True
+        #verificando token e validade dele
+        token_validate = False
+        date_now = int(datetime.datetime.now().replace(tzinfo=pytz.utc).timestamp())
+        for x in range(len(cache_app_before_login)):
+            if token == cache_app_before_login[x][2]:
+                if date_now < cache_app_before_login[x][3]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema e ainda está válido  
+                    token_validate = True
                     break
-            if verified:
-                return redirect(url_for("change_password", email=email, token=token))
-            else:
-                return render_template('verify_code_forgot_password.html', form=form, email=email)
-        else:
-            return render_template('verify_code_forgot_password.html', form=form, email=email)
-    else:
-        return redirect(url_for("index"))
-
-
-@app.route("/change_password/<string:email>/<string:token>/", methods=['GET', 'POST'])
-def change_password(email, token):
-    global cache_app_before_login
-    if not current_user.is_authenticated:
-        form = ChangePasswordForm()
-        if form.validate_on_submit():
-            for x in range(len(cache_app_before_login)):
-                if email == cache_app_before_login[x][0]['email'] and token == cache_app_before_login[x][2]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema                    
-                    new_password = form.new_password.data
-                    user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password)
-                    new_password = form.new_password.data
-                    database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
-                    cache_app_before_login.pop(x)
+                else:
+                    cache_app_before_login.pop(x) #limpa o cache_app_before_login
                     break
-            if True:
-                return redirect(url_for("change_password", token=token))
+        if token_validate:   
+            form = VerifyCodeForgotPasswordForm()
+            if form.validate_on_submit():
+                verified_code = False            
+                for x in range(len(cache_app_before_login)):
+                    if form.code.data == cache_app_before_login[x][1]: #verifica se o codigo digitado é válido     
+                        verified_code = True
+                        break
+                if verified_code:
+                    token_verification_code = f"{token[:50]}{form.code.data}{token[50:]}" #concatena o token com o codigo enviado
+                    return redirect(url_for("change_password", token_verification_code=token_verification_code))
+                else:
+                    return render_template('verify_code_forgot_password.html', form=form)
             else:
-                return render_template('verify_code_forgot_password.html', form=form, email=email)
-        else:
-            return render_template('change_password.html', form=form)
+                return render_template('verify_code_forgot_password.html', form=form)
+        else:    
+            abort(404)
     else:
         return redirect(url_for("index"))
 
-#### tratamento de exceções nas rotas ####
+#Alteração de senha após as validações anteriores da recuperação de senha
+@app.route("/change_password/<string:token_verification_code>/", methods=['GET', 'POST'])
+def change_password(token_verification_code):
+    if not current_user.is_authenticated:
+        global cache_app_before_login
+        token_validate = False        
+        token = f"{token_verification_code[:50]}{token_verification_code[56:]}"
+        date_now = int(datetime.datetime.now().replace(tzinfo=pytz.utc).timestamp())
+        for x in range(len(cache_app_before_login)):
+            if token == cache_app_before_login[x][2]:
+                if date_now < cache_app_before_login[x][3]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema e ainda está válido  
+                    token_validate = True
+                    break
+                else:
+                    cache_app_before_login.pop(x) #limpa o cache_app_before_login
+                    break
+        if token_validate:   
+            form = ChangePasswordForm()
+            if form.validate_on_submit():
+                change_password_success = False   
+                verification_code = int(token_verification_code[50:56])             
+                for x in range(len(cache_app_before_login)):      
+                    if verification_code == cache_app_before_login[x][1]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema                    
+                        new_password = form.new_password.data
+                        user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password) #gera um novo objeto de usuario para atualizar no banco
+                        new_password = form.new_password.data
+                        database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
+                        cache_app_before_login.pop(x) #limpa o cache_app_before_login
+                        change_password_success = True
+                        break
+                if change_password_success:
+                    return redirect(url_for("login"))
+                else:
+                    return render_template('change_password.html', form=form)
+            else:
+                return render_template('change_password.html', form=form)
+        else:
+            abort(404)
+    else:
+        return redirect(url_for("index"))
+
+
+#### Tratamento de exceções das rotas ####
 
 @app.errorhandler(404)
 def errorPage(e):
-    return render_template('404.html')
+    return render_template('404.html', e=e)
     
 @app.errorhandler(401)
 def page_not_found(e):
@@ -534,10 +593,10 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def errorPage(e):
-    return render_template('500.html')
+    return render_template('500.html', e=e)
 
 
-#### test ####
+#### Rotas de teste ####
 
 @app.route("/test/", methods=['GET', 'POST'])
 def test():

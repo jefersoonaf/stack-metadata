@@ -12,6 +12,11 @@ class User():
         self.name = name
         self.email = email
         self.password = generate_password_hash(password)
+        """self.recovery_password = {
+            "code": None,
+            "token": None,
+            "validate": None
+        }"""
         
     def get_as_json(self):
         return self.__dict__

@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Profile {% endblock title %}
-{% block section_content %}
+{% block title %} StackMetadata | Perfil {% endblock title %}
+{% block head %}
+  {{ super() }}
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+{% endblock head %}
+{% block section_content %} 
 <div class="wrapper">
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -9,12 +14,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Profile</h1>
+            <h1>Perfil</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-              <li class="breadcrumb-item active">User Profile</li>
+              <li class="breadcrumb-item active">Perfil</li>
             </ol>
           </div>
         </div>
@@ -36,8 +41,8 @@
                        src="{{ url_for('static', filename='dist/img/user_icon.png') }}"
                        alt="User profile picture"> -->
                 </div>
-
                 <h3 class="profile-username text-center">{{ current_user.name }}</h3>
+                <h2 class="profile-username text-center">{{ current_user.email }}</h2>
                 <!--
                   <p class="text-muted text-center">Software Engineer</p>
 
@@ -65,49 +70,95 @@
             <div class="card">
               <div class="card-header p-0">
                 <ul class="nav nav-pills">
-                  <h2 class="nav-item ml-2 mt-2">Dados da conta / Alteração</h2>
+                  <h2 class="nav-item ml-2 mt-2">Dados do perfil / Alteração</h2>
                 </ul>
               </div><!-- /.card-header -->
               <div class="card-body">
-                <form class="form-horizontal">
-                  <div class="form-group row">
-                    <label for="inputName" class="col-sm-2 col-form-label">Nome</label>
-                    <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputName" placeholder="Name">
-                    </div>
+                <form class="form-horizontal" action="", method="post">
+                  {{ form.hidden_tag() }}
+                  <div class="input-group mb-3">
+                    {{ form.name.label(class="col-sm-2 col-form-label") }}
+                    {% if form.name.errors %}
+                      {{ form.name(class="col-sm-10 form-control form-control-user is-invalid") }}
+                      <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    {% else %}                    
+                      {{ form.name(class="col-sm-10 form-control form-control-user", placeholder="Nome e Sobrenome") }}                                      
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <span class="fas fa-user"></span>
+                        </div>
+                      </div>
+                    {% endif %}  
                   </div>
-                  <div class="form-group row">
-                    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputEmail" placeholder="Email">
-                    </div>
+                  <div class="input-group mb-3">
+                    {{ form.current_password.label(class="col-sm-2 col-form-label") }}
+                    {% if form.current_password.errors %}
+                      {{ form.current_password(class="col-sm-10 form-control form-control-user is-invalid") }}
+                      <div class="invalid-feedback">
+                        {% for error in form.current_password.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    {% else %} 
+                      {{ form.current_password(class="col-sm-10 form-control form-control-user", placeholder="Senha atual") }}
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <span class="fas fa-lock"></span>
+                        </div>
+                      </div>
+                    {% endif %}
                   </div>
-                  <div class="form-group row">
-                    <label for="inputName2" class="col-sm-2 col-form-label">Senha</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputName2" placeholder="Senha">
-                    </div>
+                  <div class="input-group mb-3">
+                    {{ form.new_password.label(class="col-sm-2 col-form-label") }}
+                    {% if form.new_password.errors %}
+                      {{ form.new_password(class="col-sm-10 form-control form-control-user is-invalid") }}
+                      <div class="invalid-feedback">
+                        {% for error in form.new_password.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      {{ form.new_password(class="col-sm-10 form-control form-control-user", placeholder="Nova senha") }}
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <span class="fas fa-lock"></span>
+                        </div>
+                      </div>
+                    {% endif %}
                   </div>
-                  <div class="form-group row">
-                    <label for="inputSkills" class="col-sm-2 col-form-label">Confirmação da senha</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputSkills" placeholder="Confirmação da senha">
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <div class="offset-sm-2 col-sm-10">
-                      <div class="checkbox">
-                        <label>
-                          <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                        </label>
+                  <div class="input-group mb-3">
+                    {{ form.confirm_new_password.label(class="col-sm-2 col-form-label") }}
+                    {% if form.confirm_new_password.errors %}
+                      {{ form.confirm_new_password(class="col-sm-10 form-control form-control-user is-invalid") }}
+                      <div class="offset-sm-2 col-sm-10 invalid-feedback">
+                        {% for error in form.confirm_new_password.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      {{ form.confirm_new_password(class="col-sm-10 form-control form-control-user", placeholder="Repita a nova senha") }}
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <span class="fas fa-lock"></span>
+                        </div>
+                      </div>
+                    {% endif %}                  
+                  </div>             
+                  <div class="input-group row">
+                    <div class="offset-sm-2 col-sm-8">
+                      <div class="icheck-warning">
+                        {{ form.confirm_change(class="form-check-input") }}
+                        {{ form.confirm_change.label(class="form-check-label") }}
                       </div>
                     </div>
-                  </div>
-                  <div class="form-group row">
-                    <div class="offset-sm-2 col-sm-10">
-                      <button type="submit" class="btn btn-danger">Submit</button>
+                    <div class="col-sm-2">
+                      {{ form.submit(class="btn btn-warning btn-block") }}
                     </div>
-                  </div>
+                  </div>      
                 </form>
               </div><!-- /.card-body -->
             </div>

@@ -57,16 +57,7 @@ class StackExchange():
             search_url += f"&q={search_parameter}"
             
         search_url += f"&site={site_parameter}&filter=!1v9wA_b0TvaNe0Jko_zIHaSwt5vMy*VHH.lMAl91lcG.cUUGmu3lkf365mQjY53oS(1"
-        """
-        /2.3/search/advanced?page=1&pagesize=1&fromdate=1625097600&todate=1625184000&order=desc&sort=votes&q=aaaa&accepted=True&body=teste&nottagged=java&tagged=jinja&title=python&site=stackoverflow&filter=!)P9Zz*9Vw)xiNXS8z58wmvC6J-kZK_ZLMu-0t6N(5.ph)CTSI48kGpV45kx22_f-pQd9_D
-        """
-        """self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={search_parameter}&site={site_parameter}&filter=!)E0fBjq-AsnarVKlARBxRcJDFDX8j60oDmcDl3M9iAJhKYBIq")"""
-        
         self.format_url(search_url)
-        
-        
-        #self.format_url(f"search/advanced?page={self.page}&pagesize={self.page_size}&order=desc&sort=votes&accepted=True&title={search_parameter}&site={site_parameter}&filter=!1v9wA_b0TvaNe0Jko_zIHaSwt5vMy*VHH.lMAl91lcG.cUUGmu3lkf365mQjY53oS(1")
-        #print(self.current_url)
         response = requests.get(self.current_url)
         page_items = response.json()
         all_page_items = []

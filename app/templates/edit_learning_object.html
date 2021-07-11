@@ -55,7 +55,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <form id="form" action="{{ url_for('save_edit', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" method="POST">
+        <form id="form" action="{{ url_for('update_learning_object', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" method="POST">
           <button class="btn-lg btn-success mb-4" type="submit" onclick="sendjson()">
             <span class="icon text-white-50">
               <i class="fas fa-save"></i>
@@ -2099,7 +2099,7 @@
       function sendjson(){
         var obj = $('#form').serializeJSON({useIntKeysAsArrayIndex: true, disableColonTypes: true});                                  
         var jsonString = JSON.stringify(obj);
-        var url = "{{ url_for('save_edit', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}";
+        var url = "{{ url_for('update_learning_object', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}";
 
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url);
