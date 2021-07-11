@@ -1,7 +1,7 @@
 #import flask app
 from app import app, mail
 #import dos metodos do flask
-from flask import request, render_template, url_for, redirect, flash, abort
+from flask import Flask, request, render_template, url_for, redirect, flash, abort
 #import do objeto do banco de dados
 from app import database
 #import das coleções do banco de dados
@@ -341,8 +341,13 @@ def login():
                     flash('Login realizado com sucesso!', 'success')
                     return redirect(url_for("index"))
                 else:
-                    flash('Problema com o login. Por favor verifique seu email e senha.', 'danger')
-        return render_template('login.html', form=form)
+                    flash('Ocorreu um erro ao tentar fazer login. Por favor verifique sua senha!', 'danger')
+                    return redirect(url_for("login"))  
+            else:
+                flash('Ocorreu um erro ao tentar fazer login. Por favor verifique seu email e senha!', 'danger')
+                return redirect(url_for("login")) 
+        else:                
+            return render_template('login.html', form=form)
     else:
         return redirect(url_for("index"))
 
@@ -362,8 +367,6 @@ def logout():
 @app.route("/profile/", methods=['GET', 'POST'])
 @login_required
 def profile():
-    msg_dialog = None
-    type_dialog = None
     form = ProfileForm()
     if form.validate_on_submit():
         name = form.name.data
@@ -379,23 +382,20 @@ def profile():
                 if new_password == confirm_new_password:
                     user_temp = User(name, current_user.email, new_password)
                     database.update("users", user_bd, user_temp.get_as_json())
-                    msg_dialog = "Dados do perfil alterados com sucesso!"
-                    type_dialog = "dafault"
                     form.name.data = name
-                    return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
+                    flash('Dados do perfil alterados com sucesso!', 'success')
+                    return render_template('profile.html', form=form)
                 else:
-                    msg_dialog = "A confirmação de senha está incorreta!"
-                    type_dialog = "danger"
-                    return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
+                    flash('A confirmação de senha está incorreta!', 'danger')                    
+                    return render_template('profile.html', form=form)
             else:
-                msg_dialog = "A senha atual informada está incorreta!"
-                type_dialog = "danger"
-                return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
+                flash('A senha atual informada está incorreta!', 'danger')                        
+                return render_template('profile.html', form=form)
         else:
             abort(500)
     else:
         form.name.data = current_user.name
-        return render_template('profile.html', form=form, msg_dialog=msg_dialog, type_dialog=type_dialog)
+        return render_template('profile.html', form=form)
 
 #Recuperação de senha
 @app.route("/forgot_password/", methods=['GET', 'POST'])

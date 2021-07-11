@@ -15,6 +15,34 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
 </head>
 <body class="hold-transition register-page">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <!-- .modal -->
+        <div class="modal fade" id="myModal">
+          <div class="modal-dialog">
+            <div class="modal-content bg-{{ category }}">
+              <div class="modal-header">
+                <h4 class="modal-title">Info</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>{{ message }}</p>                   
+              </div>
+              <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
   <div class="register-box">
     <!-- /.login-logo -->
     <div class="card card-outline card-primary">
@@ -23,7 +51,6 @@
       </div>
       <div class="card-body">
         <p class="login-box-msg">Faça login para iniciar sua seção</p>
-
         <form action="" method="post">
           {{ form.hidden_tag() }}
           <div class="input-group mb-3">
@@ -87,173 +114,21 @@
     <!-- /.card -->
   </div>
   <!-- /.login-box -->
-  {% if msg_dialog != "" %}
-    <!-- .dialogs messages -->
-      {% if type_dialog == "info" %}
-        <!-- .info -->
-        <div class="modal fade" id="modal-info">
-          <div class="modal-dialog">
-            <div class="modal-content bg-info">
-              <div class="modal-header">
-                <h4 class="modal-title">Info</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>{{ msg_dialog }}</p>
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-        <!-- /.modal -->
-        <!-- /.info -->
-      {% elif type_dialog == "primary" %}
-        <!-- .primary -->
-        <div class="modal fade" id="modal-primary">
-          <div class="modal-dialog">
-            <div class="modal-content bg-primary">
-              <div class="modal-header">
-                <h4 class="modal-title">Info</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>{{ msg_dialog }}</p>
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-        <!-- /.modal -->
-        <!-- /.primary -->
-      {% elif type_dialog == "success" %}
-        <!-- .success -->
-        <div class="modal fade" id="modal-success">
-          <div class="modal-dialog">
-            <div class="modal-content bg-success">
-              <div class="modal-header">
-                <h4 class="modal-title">Sucesso</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>{{ msg_dialog }}</p>
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-        <!-- /.modal -->
-        <!-- /.success -->
-      {% elif type_dialog == "warning" %}
-        <!-- .warning -->
-        <div class="modal fade" id="modal-warning">
-          <div class="modal-dialog">
-            <div class="modal-content bg-warning">
-              <div class="modal-header">
-                <h4 class="modal-title">Atenção</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>{{ msg_dialog }}</p>
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Ok</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-        <!-- /.modal -->
-        <!-- /.warning -->
-      {% elif type_dialog == "danger" %}
-        <!-- .danger -->
-        <div class="modal fade" id="modal-danger">
-          <div class="modal-dialog">
-            <div class="modal-content bg-danger">
-              <div class="modal-header">
-                <h4 class="modal-title">Atenção</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>{{ msg_dialog }}</p>
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-        <!-- /.modal -->
-        <!-- /.danger -->
-      {% endif %}
-    <!-- ./dialogs messages -->
-  {% endif %}
+
   <!-- jQuery -->
   <script src="{{ url_for('static', filename='plugins/jquery/jquery.min.js') }}"></script>
   <!-- Bootstrap 4 -->
   <script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <!-- AdminLTE App -->
   <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
-  {% if msg_dialog != "" %}
-    {% if type_dialog == "info" %}
-      <script>
-        $(function() {
-          $("#modal-info").modal('show');
-        })
-      </script>
-    {% endif %}
-    {% if type_dialog == "primary" %}
-      <script>
-        $(function() {
-          $("#modal-primary").modal('show');
-        })
-      </script>
-    {% endif %}
-    {% if type_dialog == "success" %}
-      <script>
-        $(function() {
-          $("#modal-success").modal('show');
-        })
-      </script>
-    {% endif %}
-    {% if type_dialog == "warning" %}
-      <script>
-        $(function() {
-          $("#modal-warning").modal('show');
-        })
-      </script>
-    {% endif %}
-    {% if type_dialog == "danger" %}
-      <script>
-        $(function() {
-          $("#modal-danger").modal('show');
-        })
-      </script>
-    {% endif %}
-  {% endif %}
+  <script>
+    $(document).ready(function() {
+      var messages = "{{ get_flashed_messages() }}";
+
+      if (typeof messages != 'undefined' && messages != '[]') {
+        $("#myModal").modal();
+      };
+    });
+  </script>
 </body>
 </html>
