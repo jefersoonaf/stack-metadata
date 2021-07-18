@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>StackMetadata | login</title>
 
+  <!-- Logo -->
+  <link rel="sortcut icon" href="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" type="image/png" />
+
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -15,7 +18,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
 </head>
 <body class="hold-transition register-page">
-  {% with messages = get_flashed_messages(with_categories=true) %}
+
+    <!-- .modal para todos os tipos de mensagens -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
         <!-- .modal -->
@@ -43,6 +48,8 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
+  <!-- /.modal para todos os tipos de mensagens -->
+
   <div class="register-box">
     <!-- /.login-logo -->
     <div class="card card-outline card-primary">

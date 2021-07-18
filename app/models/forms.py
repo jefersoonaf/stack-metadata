@@ -35,5 +35,5 @@ class VerifyCodeForgotPasswordForm(FlaskForm):
     
 class ChangePasswordForm(FlaskForm):
     new_password = PasswordField("Nova senha", validators=[DataRequired()], render_kw={'autofocus': True})
-    repeat_new_password = PasswordField("Confirme a nova senha", validators=[DataRequired(), EqualTo('new_password')])
+    confirm_new_password = PasswordField("Confirme a nova senha", validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Alterar senha')

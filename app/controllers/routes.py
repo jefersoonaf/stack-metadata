@@ -103,7 +103,6 @@ def view_sites():
 @login_required
 def search_api():
     sites = database.list("sites")
-    #global list_sites
     list_sites = []
     for site in sites:
         list_sites.append(site["site"])
@@ -136,17 +135,6 @@ def results_search_api():
     selected_type_search = request.form.getlist('selected-type-search') 
     #pegar a busca
     search = request.form.get('search')
-    #date_format = ciso8601.parse_datetime(str(date_start))
-    # to get time in seconds:
-    #print(time.mktime(date_format.timetuple()))
-    """print(date_start)
-    print(date_end)
-    print(selected_sort)
-    print(selected_order)
-    print(selected_tagged)
-    print(selected_nottagged)
-    print(selected_type_search[0])
-    print(accepted)"""
     
     if selected_sites:
         for option in selected_sites:
@@ -156,10 +144,127 @@ def results_search_api():
                     list_sites_api.append(site["site"])
                     break
     for site in list_sites_api:
-        #list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]))
         list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]), date_start, date_end, str(selected_sort), str(selected_order), accepted, selected_tagged, selected_nottagged, str(selected_type_search[0]))
         list_results.append(list_result_items)
     
+    update_results = []
+    update = []
+    for results, site in zip(list_results, list_sites_api):
+        for result in results:
+            item_db = database.filter_by('learning_objects', {"general.identifier": result["question_id"]})
+            if item_db:
+                update.append(1)
+            else:
+                update.append(0)
+        update_results.append(update)
+        update = []
+    
+    cache_user = []
+    for x in range(len(cache_app_after_login)):
+        if current_user.email == cache_app_after_login[x][0]:              
+            cache_user = cache_app_after_login[x]
+            cache_user[1] = list_results
+            cache_user[2] = list_sites_api
+            cache_user[3] = update_results
+            cache_app_after_login[x] = cache_user
+            break        
+    if not cache_user:        
+        cache_user.append(current_user.email)
+        cache_user.append(list_results)
+        cache_user.append(list_sites_api)
+        cache_user.append(update_results)
+        cache_app_after_login.append(cache_user)
+    
+    return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
+
+#Cria um novo objeto de aprendizagem a partir da pesquisa retornada na api
+@app.route("/create_learning_object/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
+@login_required
+def create_learning_object(index_list_results, index_result, name_site, api_site):
+    list_results = []
+    list_sites_api = []
+    update_results = []
+    cache_user = []
+    global cache_app_after_login
+    index_user = None
+    for x in range(len(cache_app_after_login)):
+        if current_user.email == cache_app_after_login[x][0]:              
+            cache_user = cache_app_after_login[x]
+            index_user = x
+            break  
+    if cache_user:                                
+        list_results = cache_user[1]
+        list_sites_api = cache_user[2]
+        update_results = cache_user[3]       
+    save_item = list_results[index_list_results][index_result]
+    #verificar se já esta no banco de dados e impedir de incluir novamente
+    learning_object = LearningObject(save_item, name_site, api_site)
+    learning_object_json = learning_object.get_as_json()
+    item_db = database.filter_by('learning_objects', {"general.identifier": learning_object_json['general']['identifier'][1]})
+    if not item_db:
+        database.create("learning_objects", learning_object)
+        update_results[index_list_results][index_result] = 1
+        cache_user[3] = update_results
+        cache_app_after_login[index_user] = cache_user
+        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
+    else:
+        database.update("learning_objects", item_db[0])
+        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
+
+#Pesquisa de objetos de aprendizagens no banco de dados
+@app.route("/search_database/")
+@login_required
+def search_database():
+    sites = database.list("sites")
+    list_sites = []
+    for site in sites:
+        list_sites.append(site["site"])
+    return render_template("search_database.html", sites=list_sites)
+
+#Apresenta os resultados da pesquisa no banco de dados
+@app.route("/results_search_database/", methods=['POST'])
+@login_required
+def results_search_database():
+    global cache_app_after_login
+    stackexchange = StackExchange(30, 1)
+    sites = database.list("sites")
+    list_sites_api = []
+    list_results = []
+    
+    #pegar as datas
+    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    #pegar as ordenações
+    selected_sort = request.form.get('selected-sort')
+    selected_order = request.form.get('selected-order')
+    #pegar as tags e não tags
+    selected_tagged = request.form.get('selected-tagged')
+    selected_nottagged = request.form.get('selected-nottagged')
+    #pegar os sites
+    selected_sites = request.form.getlist('selected-sites')
+    #pegar seleção de somente perguntas aceitas
+    accepted = request.form.get('accepted')
+    #pegar o tipo da busca
+    selected_type_search = request.form.getlist('selected-type-search') 
+    #pegar a busca
+    search = request.form.get('search')
+    
+    if selected_sites:
+        for option in selected_sites:
+            option = option.split("-")[1]
+            for site in sites:
+                if option == site["site"]["api_parameter"]:
+                    list_sites_api.append(site["site"])
+                    break
+    for site in list_sites_api:
+        list_result_items = database.search_advanced(search, site)
+        list_results.append(list_result_items)
+    
+    print(list_results[1][0])
+    
+    #definir um index $ para especificar se o cache é referente a busca na api ou busca no banco
+    
+    '''
     update_results = []
     update = []
     for results, site in zip(list_results, list_sites_api):
@@ -187,78 +292,12 @@ def results_search_api():
         cache_user.append(list_sites_api)
         cache_user.append(update_results)
         cache_app_after_login.append(cache_user)
-    
-    return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
-
-#Cria um novo objeto de aprendizagem a partir da pesquisa retornada na api
-@app.route("/create_learning_object/<int:index_list_results>/<int:index_result>/<string:name_site>/<string:api_site>")
-@login_required
-def create_learning_object(index_list_results, index_result, name_site, api_site):
-    list_results = []
-    list_sites_api = []
-    update_results = []
-    cache_user = []
-    global cache_app_after_login
-    user = None
-    for x in range(len(cache_app_after_login)):
-        if current_user.email == cache_app_after_login[x][0]:              
-            cache_user = cache_app_after_login[x]
-            user = x
-            break  
-    if cache_user:                                
-        list_results = cache_user[1]
-        list_sites_api = cache_user[2]
-        update_results = cache_user[3]       
-    save_item = list_results[index_list_results][index_result]
-    #verificar se já esta no banco de dados e impedir de incluir novamente
-    learning_object = LearningObject(save_item, name_site, api_site)
-    learning_object_json = learning_object.get_as_json()
-    item_db = database.filter_by('learning_objects', {"general.identifier": learning_object_json['general']['identifier'][1]})
-    if not item_db:
-        print("create")
-        database.create("learning_objects", learning_object)
-        update_results[index_list_results][index_result] = 1
-        cache_user[3] = update_results
-        cache_app_after_login[user] = cache_user
-        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
-    else:
-        print("update")
-        database.update("learning_objects", item_db[0])
-        return render_template("results_search_api.html", list_results=list_results, list_sites_api=list_sites_api, update_results=update_results)
-
-#Pesquisa de objetos de aprendizagens no banco de dados
-@app.route("/search_database/")
-def search_database():
-    sites = database.list("sites")
-    list_sites = []
-    for site in sites:
-        list_sites.append(site["site"])
-    return render_template("search_database.html", sites=list_sites)
-
-#Apresenta os resultados da pesquisa no banco de dados
-@app.route("/results_search_database/")
-def results_search_database():
-    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
-    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
-    #pegar as ordenações
-    selected_sort = request.form.get('selected-sort')
-    selected_order = request.form.get('selected-order')
-    #pegar as tags e não tags
-    selected_tagged = request.form.get('selected-tagged')
-    selected_nottagged = request.form.get('selected-nottagged')
-    #pegar os sites
-    selected_sites = request.form.getlist('selected-sites')
-    #pegar seleção de somente perguntas aceitas
-    accepted = request.form.get('accepted')
-    #pegar o tipo da busca
-    selected_type_search = request.form.getlist('selected-type-search') 
-    #pegar a busca
-    search = request.form.get('search')
-    pass
+    '''
+    return render_template("search_database.html")
 
 #Visualiza os objetos de aprendizagens que estão no banco de dados
-@login_required
 @app.route("/view_learning_objects/")
+@login_required
 def view_learning_objects():
     learning_objects = database.list("learning_objects")
     list_learning_objects = []
@@ -267,22 +306,22 @@ def view_learning_objects():
     return render_template("view_learning_objects.html", learning_objects=list_learning_objects)
 
 #Visualiza o objeto de aprendizagem
-@login_required
 @app.route("/view_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+@login_required
 def view_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("view_learning_object.html", learning_object=learning_object[0])
 
 #Edita o objeto de aprendizagem
-@login_required
 @app.route("/edit_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+@login_required
 def edit_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("edit_learning_object.html", learning_object=learning_object[0])
 
 #Atualiza o objeto de aprendizagem que foi editado
-@login_required
 @app.route("/update_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])
+@login_required
 def update_learning_object(id_learning_object_0, id_learning_object_1):
     save_edit_learning_object = request.get_json()
     if save_edit_learning_object:
@@ -292,8 +331,8 @@ def update_learning_object(id_learning_object_0, id_learning_object_1):
     return redirect(url_for("view_learning_objects"))
 
 #Deleta o objeto de aprendizagem
-@login_required
 @app.route("/delete_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>")
+@login_required
 def delete_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object_db = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     database.delete("learning_objects", learning_object_db[0])
@@ -311,16 +350,23 @@ def register():
             name = form.name.data
             email = form.email.data
             password = form.password.data
+            confirm_password = form.confirm_password.data
             query = database.filter_by('users', {"email": email})
             if not query:
-                user = User(name, email, password)
-                database.create("users", user)
-                flash('Conta registrada com sucesso!', 'success')
-                return redirect(url_for("login"))
+                if password == confirm_password:
+                    user = User(name, email, password)
+                    database.create("users", user)
+                    flash('Conta registrada com sucesso!', 'success')
+                    return redirect(url_for("login"))
+                else:
+                    flash('A senha de confirmação está incorreta!', 'danger')
+                    return render_template('register.html', form=form)
             else:
-                flash('Email já cadastrado', 'danger')
+                flash('Email já cadastrado!', 'danger')
+                return render_template('register.html', form=form)
         return render_template('register.html', form=form)
     else:
+        flash('Você já está logado no sistema!', 'info')
         return redirect(url_for("index"))
 
 #Login - Entrar no sistema
@@ -338,7 +384,6 @@ def login():
                 if check_password_hash(user_bd['password'], password):
                     user = User(user_bd['name'], user_bd['email'], user_bd['password'])
                     login_user(user, remember=remember)
-                    flash('Login realizado com sucesso!', 'success')
                     return redirect(url_for("index"))
                 else:
                     flash('Ocorreu um erro ao tentar fazer login. Por favor verifique sua senha!', 'danger')
@@ -349,6 +394,7 @@ def login():
         else:                
             return render_template('login.html', form=form)
     else:
+        flash('Você já está logado no sistema!', 'info')
         return redirect(url_for("index"))
 
 #Logout - Sair do sistema
@@ -360,7 +406,7 @@ def logout():
         if current_user.email == cache_app_after_login[x][0]:              
             cache_app_after_login.pop(x)
             break
-    logout_user()
+    logout_user()                      
     return redirect(url_for("login"))
 
 #Perfil do usuário
@@ -455,7 +501,7 @@ def forgot_password():
                                         <tr>
                                             <td align="center">
                                                 <p style="line-height:1.5;font-family:'Lato',Calibri,Arial,sans-serif;font-size:18px;color:#000000;text-align:center;text-decoration:none"> 
-                                                    Para resuperar a sua senha use o código abaixo:
+                                                    Para recuperar a seu acesso use o código abaixo:
                                                 </p>
                                             </td>
                                         </tr>
@@ -494,13 +540,20 @@ def forgot_password():
                         <div class="adL"></div>
                     </div>
                 """
-                mail.send(msg)
-                return redirect(url_for("verify_code_forgot_password", token=token_temp))
+                try:                    
+                    mail.send(msg)
+                    flash('Código enviado no email informado!', 'primary')            
+                    return redirect(url_for("verify_code_forgot_password", token=token_temp))
+                except:
+                    flash('Ocorreu um problema ao tentar enviar o código, por favor tente novamente!', 'danger')                                
+                    return redirect(url_for("forgot_password"))                    
             else:
+                flash('Resgistro não encontrado, por favor realize seu registro no sistema!', 'warning')
                 return redirect(url_for("register"))
         else:
             return render_template('forgot_password.html', form=form)
     else:
+        flash('Você já está logado no sistema!', 'info')
         return redirect(url_for("index"))
     
 #Verifica código enviado da recuperação de senha
@@ -509,75 +562,65 @@ def verify_code_forgot_password(token):#verificar se codigo esta no cache e se e
     if not current_user.is_authenticated:
         global cache_app_before_login
         #verificando token e validade dele
-        token_validate = False
         date_now = int(datetime.datetime.now().replace(tzinfo=pytz.utc).timestamp())
         for x in range(len(cache_app_before_login)):
             if token == cache_app_before_login[x][2]:
                 if date_now < cache_app_before_login[x][3]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema e ainda está válido  
-                    token_validate = True
-                    break
+                    form = VerifyCodeForgotPasswordForm()
+                    if form.validate_on_submit():
+                        if form.code.data == cache_app_before_login[x][1]: #verifica se o codigo digitado é válido                                     
+                            token_verification_code = f"{token[:50]}{form.code.data}{token[50:]}" #concatena o token com o codigo enviado
+                            flash('Código verificado com sucesso!', 'success')
+                            return redirect(url_for("change_password", token_verification_code=token_verification_code))
+                        else:
+                            flash('O código informado está incorreto!', 'danger')                    
+                            return render_template('verify_code_forgot_password.html', form=form)
+                    else:
+                        return render_template('verify_code_forgot_password.html', form=form)                    
                 else:
-                    cache_app_before_login.pop(x) #limpa o cache_app_before_login
-                    break
-        if token_validate:   
-            form = VerifyCodeForgotPasswordForm()
-            if form.validate_on_submit():
-                verified_code = False            
-                for x in range(len(cache_app_before_login)):
-                    if form.code.data == cache_app_before_login[x][1]: #verifica se o codigo digitado é válido     
-                        verified_code = True
-                        break
-                if verified_code:
-                    token_verification_code = f"{token[:50]}{form.code.data}{token[50:]}" #concatena o token com o codigo enviado
-                    return redirect(url_for("change_password", token_verification_code=token_verification_code))
-                else:
-                    return render_template('verify_code_forgot_password.html', form=form)
-            else:
-                return render_template('verify_code_forgot_password.html', form=form)
-        else:    
-            abort(404)
+                    flash('Token expirou! Reenvie outro código para recuperar sua senha!', 'warning')
+                    abort(404)
+        #caso não encontre o token no cache                    
+        flash('Token inválido! Reenvie outro código para recuperar sua senha!', 'danger')                                    
+        abort(404)
     else:
+        flash('Você já está logado no sistema!', 'info')
         return redirect(url_for("index"))
 
 #Alteração de senha após as validações anteriores da recuperação de senha
 @app.route("/change_password/<string:token_verification_code>/", methods=['GET', 'POST'])
 def change_password(token_verification_code):
     if not current_user.is_authenticated:
-        global cache_app_before_login
-        token_validate = False        
+        global cache_app_before_logi       
+        verification_code = int(token_verification_code[50:56])
         token = f"{token_verification_code[:50]}{token_verification_code[56:]}"
         date_now = int(datetime.datetime.now().replace(tzinfo=pytz.utc).timestamp())
         for x in range(len(cache_app_before_login)):
-            if token == cache_app_before_login[x][2]:
+            if verification_code == cache_app_before_login[x][1] and token == cache_app_before_login[x][2]:
                 if date_now < cache_app_before_login[x][3]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema e ainda está válido  
-                    token_validate = True
-                    break
-                else:
-                    cache_app_before_login.pop(x) #limpa o cache_app_before_login
-                    break
-        if token_validate:   
-            form = ChangePasswordForm()
-            if form.validate_on_submit():
-                change_password_success = False   
-                verification_code = int(token_verification_code[50:56])             
-                for x in range(len(cache_app_before_login)):      
-                    if verification_code == cache_app_before_login[x][1]: #verifica se o token passado no link é o mesmo que foi gerado pelo sistema                    
+                    form = ChangePasswordForm()
+                    if form.validate_on_submit():    
                         new_password = form.new_password.data
-                        user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password) #gera um novo objeto de usuario para atualizar no banco
-                        new_password = form.new_password.data
-                        database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
-                        cache_app_before_login.pop(x) #limpa o cache_app_before_login
-                        change_password_success = True
-                        break
-                if change_password_success:
-                    return redirect(url_for("login"))
+                        confirm_new_password = form.confirm_new_password.data   
+                        if new_password == confirm_new_password: #verifica se a senha está realmente correta                   
+                            user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password) #gera um novo objeto de usuario para atualizar no banco
+                            database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
+                            cache_app_before_login.pop(x) #limpa o cache_app_before_login                            
+                            flash('Senha alterar com sucesso!', 'success')                                                        
+                            return redirect(url_for("login"))
+                        else:
+                            flash('A confirmação de senha está incorreta!', 'danger')                                                                            
+                            return render_template('change_password.html', form=form)
+                    else:
+                        return render_template('change_password.html', form=form)
                 else:
-                    return render_template('change_password.html', form=form)
-            else:
-                return render_template('change_password.html', form=form)
-        else:
-            abort(404)
+                    flash('Token expirou! Reenvie outro código para recuperar sua senha!', 'warning')
+                    abort(404)
+        #caso não encontre o token no cache
+        flash('Token inválido! Reenvie outro código para recuperar sua senha!', 'danger')
+        abort(404)
     else:
+        flash('Você já está logado no sistema!', 'info')        
         return redirect(url_for("index"))
 
 
@@ -587,8 +630,10 @@ def change_password(token_verification_code):
 def errorPage(e):
     return render_template('404.html', e=e)
     
+#Erro para quando tentar acessar uma rota que necessita de login
 @app.errorhandler(401)
 def page_not_found(e):
+    flash('Faça login primeiro!', 'danger')
     return redirect(url_for("login"))
 
 @app.errorhandler(500)

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>StackMetadata | Register</title>
 
+  <!-- Logo -->
+  <link rel="sortcut icon" href="{{ url_for('static', filename='dist/img/icon_stackmetadata.png') }}" type="image/png" />
+
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -15,19 +18,38 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
 </head>
 <body class="hold-transition register-page">
-  <div>
-  {% with messages = get_flashed_messages(with_categories=true) %}
+
+    <!-- .modal para todos os tipos de mensagens -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible">
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          <h5>Alerta!</h5>
-          {{ message }}
+        <!-- .modal -->
+        <div class="modal fade" id="myModal">
+          <div class="modal-dialog">
+            <div class="modal-content bg-{{ category }}">
+              <div class="modal-header">
+                <h4 class="modal-title">Info</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>{{ message }}</p>                   
+              </div>
+              <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Ok</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
         </div>
+        <!-- /.modal -->
       {% endfor %}
     {% endif %}
   {% endwith %}
-  </div>
+  <!-- /.modal para todos os tipos de mensagens -->
+
   <div class="register-box">
     <div class="card card-outline card-primary">
       <div class="card-header text-center">
@@ -130,5 +152,14 @@
   <script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <!-- AdminLTE App -->
   <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+      var messages = "{{ get_flashed_messages() }}";
+
+      if (typeof messages != 'undefined' && messages != '[]') {
+        $("#myModal").modal();
+      };
+    });
+  </script>
 </body>
 </html>

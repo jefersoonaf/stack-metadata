@@ -41,3 +41,10 @@ class Database(object):
 
     def delete(self, collection_name, instance):
         self.database[str(collection_name)].delete_one({"_id": instance["_id"]})
+        
+    def search_advanced(self, search, site):
+        query = {"general.title": {"$regex": f".*{search}.*", "$options": "is"}}
+        if site != None and "":
+            query = {"$and": [{"general.identifier": site},{"general.title": {"$regex": f".*{search}.*", "$options": "is"}}]}
+        return self.filter_by("learning_objects", query)
+        

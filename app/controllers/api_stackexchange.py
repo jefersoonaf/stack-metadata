@@ -71,7 +71,4 @@ class StackExchange():
                 page_items = response.json()
                 for item in page_items["items"]:
                     all_page_items.append(item)
-        return all_page_items#pegar o resto da divisão por 100
-
-    def question(self):
-        pass
+        return all_page_items
