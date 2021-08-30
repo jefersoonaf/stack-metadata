@@ -8,10 +8,12 @@ def load_user(user_id):
     return user
     
 class User():
-    def __init__(self, name, email, password):
+    def __init__(self, name, email, password, role, search_limit):
         self.name = name
         self.email = email
         self.password = generate_password_hash(password)
+        self.role = role
+        self.search_limit = search_limit
         """self.recovery_password = {
             "code": None,
             "token": None,
@@ -43,7 +45,7 @@ class User():
         query = database.filter_by('users', {"email": user_email})
         if query:
             user_bd = query[0]
-            user = User(user_bd['name'], user_bd['email'], user_bd['password'])
+            user = User(user_bd['name'], user_bd['email'], user_bd['password'], user_bd['role'], user_bd['search_limit'])
         else:
             user = None
         return user

@@ -35,9 +35,12 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Sites diponíveis para consulta</h3>
-              <a style="float: right;" class="col-md-1 btn btn-primary" href="{{ url_for('search_sites') }}">
-                <i class="fas fa-sync-alt btn-primary"></i>
-              </a>
+              <!-- controle de acesso -->
+              {% if current_user.role == "administrator" %}
+                <a style="float: right;" class="col-md-1 btn btn-primary" href="{{ url_for('search_sites') }}">
+                  <i class="fas fa-sync-alt btn-primary"></i>
+                </a>
+              {% endif %}              
             </div>
             <!-- /.card-header -->
             {% if sites %}

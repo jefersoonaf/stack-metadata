@@ -5,9 +5,9 @@ from flask import Flask, request, render_template, url_for, redirect, flash, abo
 #import do objeto do banco de dados
 from app import database
 #import das coleções do banco de dados
-from app.models.learning_object import LearningObject
-from app.models.site import Site
-from app.models.user import User
+from app.models.collections.learning_object import LearningObject
+from app.models.collections.site import Site
+from app.models.collections.user import User
 #import dos formulários
 from app.models.forms import LoginForm, RegisterForm, ProfileForm, ForgotPasswordForm, VerifyCodeForgotPasswordForm, ChangePasswordForm
 #import do contralador de seção do usuário e verificação de senha
@@ -24,6 +24,12 @@ import datetime
 import pytz
 import random
 
+#### Limite diário de busca padrão na API para novos usuários ####
+SEARCH_LIMIT = 20
+
+#### limites de busca da API por request ####
+PAGE_SIZE = 30
+MAX_PAGES = 1
 
 #### CACHE DA APLICAÇÃO ####
 
@@ -113,7 +119,10 @@ def search_api():
 @login_required
 def results_search_api():   
     global cache_app_after_login
-    stackexchange = StackExchange(30, 1)
+    if current_user.search_limit <= 0:
+        flash('Limite diário de buscas na API atingido! Novas buscas na API somente a partir de amanhã!', 'danger')
+        return redirect(url_for("index")) 
+    stackexchange = StackExchange(PAGE_SIZE, MAX_PAGES)
     sites = database.list("sites")
     list_sites_api = []
     list_results = []
@@ -174,6 +183,11 @@ def results_search_api():
         cache_user.append(list_sites_api)
         cache_user.append(update_results)
         cache_app_after_login.append(cache_user)
+     
+    #controle do limite de pesquisas diárias na API
+    current_user.search_limit -= 1
+    database.update("users", database.filter_by('users', {"email": current_user.email})[0], current_user.get_as_json())
+    
     
     return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
 
@@ -354,7 +368,7 @@ def register():
             query = database.filter_by('users', {"email": email})
             if not query:
                 if password == confirm_password:
-                    user = User(name, email, password)
+                    user = User(name, email, password, "standard", SEARCH_LIMIT)
                     database.create("users", user)
                     flash('Conta registrada com sucesso!', 'success')
                     return redirect(url_for("login"))
@@ -382,14 +396,14 @@ def login():
             if query:
                 user_bd = query[0]
                 if check_password_hash(user_bd['password'], password):
-                    user = User(user_bd['name'], user_bd['email'], user_bd['password'])
+                    user = User(user_bd['name'], user_bd['email'], user_bd['password'], user_bd['role'], user_bd['search_limit'])
                     login_user(user, remember=remember)
                     return redirect(url_for("index"))
                 else:
                     flash('Ocorreu um erro ao tentar fazer login. Por favor verifique sua senha!', 'danger')
                     return redirect(url_for("login"))  
             else:
-                flash('Ocorreu um erro ao tentar fazer login. Por favor verifique seu email e senha!', 'danger')
+                flash('Ocorreu um erro ao tentar fazer login. Email não registrado!', 'danger')
                 return redirect(url_for("login")) 
         else:                
             return render_template('login.html', form=form)
@@ -426,7 +440,7 @@ def profile():
             #verificar se a senha atual é igual a sanha no banco de dados
             if check_password_hash(user_bd['password'], current_password):       
                 if new_password == confirm_new_password:
-                    user_temp = User(name, current_user.email, new_password)
+                    user_temp = User(name, current_user.email, new_password, current_user.role, current_user.search_limit)
                     database.update("users", user_bd, user_temp.get_as_json())
                     form.name.data = name
                     flash('Dados do perfil alterados com sucesso!', 'success')
@@ -603,7 +617,7 @@ def change_password(token_verification_code):
                         new_password = form.new_password.data
                         confirm_new_password = form.confirm_new_password.data   
                         if new_password == confirm_new_password: #verifica se a senha está realmente correta                   
-                            user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password) #gera um novo objeto de usuario para atualizar no banco
+                            user_recovery_password = User(cache_app_before_login[x][0]['name'], cache_app_before_login[x][0]['email'], new_password, cache_app_before_login[x][0]['role'], cache_app_before_login[x][0]['search_limit']) #gera um novo objeto de usuario para atualizar no banco
                             database.update('users', cache_app_before_login[x][0], user_recovery_password.get_as_json())
                             cache_app_before_login.pop(x) #limpa o cache_app_before_login                            
                             flash('Senha alterar com sucesso!', 'success')                                                        
