@@ -42,7 +42,7 @@
                 <table id="data-table" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Site</th>
+                    <th>Fórum</th>
                     <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>
@@ -57,32 +57,62 @@
                         <tr>
                           <td>{{ list_sites_api[index_list_results]['name'] | safe }}</td>
                           <td class="btn-group">
-                            {% if update_results[index_list_results][index_result] == 1 %}
-                              <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-sync-alt"></i>
-                                </span>
-                                <span class="text">Atualizar</span>
-                              </a>
-                              <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-eye"></i>
-                                </span>
-                                <span class="text">Visualizar</span>
-                              </a>
+                            {% if current_user == "administrator" %}
+                              {% if update_results[index_list_results][index_result] == 1 %}
+                                <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-sync-alt"></i>
+                                  </span>
+                                  <span class="text">Atualizar</span>
+                                </a>
+                                <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-eye"></i>
+                                  </span>
+                                  <span class="text">Visualizar</span>
+                                </a>
+                              {% else %}
+                                <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-primary btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-plus"></i>
+                                  </span>
+                                  <span class="text">Adicionar</span>
+                                </a>
+                                <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split disabled" aria-disabled="true">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-eye"></i>
+                                  </span>
+                                  <span class="text">Visualizar</span>
+                                </a>
+                              {% endif %}
                             {% else %}
-                              <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-primary btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-plus"></i>
-                                </span>
-                                <span class="text">Adicionar</span>
-                              </a>
-                              <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split disabled" aria-disabled="true">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-eye"></i>
-                                </span>
-                                <span class="text">Visualizar</span>
-                              </a>
+                              {% if update_results[index_list_results][index_result] == 1 %}
+                                <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-primary btn-icon-split disabled">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-plus"></i>
+                                  </span>
+                                  <span class="text">Adicionar</span>
+                                </a>
+                                <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-eye"></i>
+                                  </span>
+                                  <span class="text">Visualizar</span>
+                                </a>
+                              {% else %}
+                                <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-primary btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-plus"></i>
+                                  </span>
+                                  <span class="text">Adicionar</span>
+                                </a>
+                                <a href="{{ url_for('view_learning_object', id_learning_object_0=list_sites_api[index_list_results]['api_parameter'],id_learning_object_1=result['question_id']) }}" class="btn btn-info btn-icon-split disabled" aria-disabled="true">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-eye"></i>
+                                  </span>
+                                  <span class="text">Visualizar</span>
+                                </a>
+                              {% endif %}
                             {% endif %}
                           </td>                          
                           <td>{{ result['title'] | safe }}</td>
@@ -94,7 +124,7 @@
                   </tbody>
                   <tfoot>
                   <tr>
-                    <th>Site</th>
+                    <th>Fórum</th>
                     <th>Ação</th>
                     <th>Título</th>
                     <th>Tags</th>

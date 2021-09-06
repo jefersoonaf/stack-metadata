@@ -34,6 +34,9 @@ class Database(object):
     
     def list(self, collection_name):
         return list(self.database[str(collection_name)].find())
+    
+    def sort(self, collection_name, order, limit):
+        return list(self.database[str(collection_name)].find().sort("_id",order).limit(limit))
 
     def update(self, collection_name, db_instance, instance):
         instance = dict(instance)
@@ -42,9 +45,36 @@ class Database(object):
     def delete(self, collection_name, instance):
         self.database[str(collection_name)].delete_one({"_id": instance["_id"]})
         
-    def search_advanced(self, search, site):
-        query = {"general.title": {"$regex": f".*{search}.*", "$options": "is"}}
-        if site != None and "":
+    def search_advanced(self, collection_name, search, site, date_start, date_end, order, type_search):
+        query = {}
+        if type_search == "Título":
+            query = {"general.title": {"$regex": f".*{search}.*", 
+                                       "$options": "is"}, 
+                     "general.identifier.0": f"{site}", 
+                     "meta_metadata.contribute.date": {"$gt": date_start, 
+                                                       "$lt": date_end}}
+        elif type_search == "Descrição":
+            query = {"general.description.question": {"$regex": f".*{search}.*", 
+                                       "$options": "is"}, 
+                     "general.identifier.0": f"{site}", 
+                     "meta_metadata.contribute.date": {"$gt": date_start, 
+                                                       "$lt": date_end}}
+        elif type_search == "Autor":
+            query = {"life_cycle.contribute.entity": {"$regex": f".*{search}.*", 
+                                       "$options": "is"}, 
+                     "general.identifier.0": f"{site}", 
+                     "meta_metadata.contribute.date": {"$gt": date_start, 
+                                                       "$lt": date_end}}
+        else: #Idioma
+            query = {"general.language": {"$regex": f".*{search}.*", 
+                                       "$options": "is"}, 
+                     "general.identifier.0": f"{site}", 
+                     "meta_metadata.contribute.date": {"$gt": date_start, 
+                                                       "$lt": date_end}}
+            
+        return list(self.database[str(collection_name)].find(query).sort("meta_metadata.contribute.date", 1 if order == "Crescente" else -1))
+            
+        """if site != None and "":
             query = {"$and": [{"general.identifier": site},{"general.title": {"$regex": f".*{search}.*", "$options": "is"}}]}
-        return self.filter_by("learning_objects", query)
+        return self.filter_by("learning_objects", query)"""
         

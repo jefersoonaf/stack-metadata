@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Sites {% endblock title %}
+{% block title %} StackMetadata | Fóruns {% endblock title %}
 {% block head %}
   {{ super() }}
   <!-- DataTables -->
@@ -15,12 +15,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Sites</h1>
+          <h1>Fóruns</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="breadcrumb-item active">Sites</li>
+            <li class="breadcrumb-item active">Fóruns</li>
           </ol>
         </div>
       </div>
@@ -34,7 +34,7 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Sites diponíveis para consulta</h3>
+              <h3 class="card-title">Fóruns diponíveis para consulta</h3>
               <!-- controle de acesso -->
               {% if current_user.role == "administrator" %}
                 <a style="float: right;" class="col-md-1 btn btn-primary" href="{{ url_for('search_sites') }}">
@@ -47,31 +47,56 @@
               <div class="card-body">
                 <table id="data-table" class="table table-bordered table-striped">
                   <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Parametro API</th>
-                    <th>URL</th>
-                    <th>Nicho</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {% for site in sites %}
+                    {% if current_user.role == "administrator"%}
                       <tr>
-                        <td>{{ site['name'] | safe}}</td>
-                        <td>{{ site['api_parameter'] }}</td>
-                        <td><a href="{{ site['url'] }}" target="_blank">{{ site['url'] }}</a></td>
-                        <td>{{ site['audience'] }}</td>
+                        <th>Nome</th>
+                        <th>Parametro API</th>
+                        <th>URL</th>
+                        <th>Nicho</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Parametro API</th>
-                    <th>URL</th>
-                    <th>Nicho</th>
-                  </tr>
-                  </tfoot>
+                      </thead>
+                      <tbody>
+                        {% for site in sites %}
+                          <tr>
+                            <td>{{ site['name'] | safe}}</td>
+                            <td>{{ site['api_parameter'] }}</td>
+                            <td><a href="{{ site['url'] }}" target="_blank">{{ site['url'] }}</a></td>
+                            <td>{{ site['audience'] }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Parametro API</th>
+                        <th>URL</th>
+                        <th>Nicho</th>
+                      </tr>
+                      </tfoot>
+                    {% else %}
+                      <tr>
+                        <th>Nome</th>
+                        <th>URL</th>
+                        <th>Nicho</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        {% for site in sites %}
+                          <tr>
+                            <td>{{ site['name'] | safe}}</td>
+                            <td><a href="{{ site['url'] }}" target="_blank">{{ site['url'] }}</a></td>
+                            <td>{{ site['audience'] }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                      <tr>
+                        <th>Nome</th>
+                        <th>URL</th>
+                        <th>Nicho</th>
+                      </tr>
+                      </tfoot>
+                    {% endif %}
                 </table>
               </div>
             {% endif %}

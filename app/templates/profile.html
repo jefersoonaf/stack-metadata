@@ -41,25 +41,39 @@
                        src="{{ url_for('static', filename='dist/img/user_icon.png') }}"
                        alt="User profile picture"> -->
                 </div>
-                <h3 class="profile-username text-center">{{ current_user.name }}</h3>
-                <h2 class="profile-username text-center">{{ current_user.email }}</h2>
-                <!--
-                  <p class="text-muted text-center">Software Engineer</p>
+                <div class="justify-content-center">
+                  <h3 class="profile-username text-center">{{ current_user.name }}</h3>
+                  <h2 class="profile-username text-center">{{ current_user.email }}</h2>
+                  {% if current_user .role != "administrator"%}
+                    <div class="d-flex justify-content-center">
+                      <a href="{{ url_for('request_admin_access') }}" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-shield-alt"></i>
+                        </span>
+                        <span class="text">Solicitar Acesso de Administrador</span>
+                      </a>
+                    </div>
+                  {% endif %}
+                                  
+                  <!--
+                    <p class="text-muted text-center">Software Engineer</p>
 
-                <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>Followers</b> <a class="float-right">1,322</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Following</b> <a class="float-right">543</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Friends</b> <a class="float-right">13,287</a>
-                  </li>
-                </ul>
+                  <ul class="list-group list-group-unbordered mb-3">
+                    <li class="list-group-item">
+                      <b>Followers</b> <a class="float-right">1,322</a>
+                    </li>
+                    <li class="list-group-item">
+                      <b>Following</b> <a class="float-right">543</a>
+                    </li>
+                    <li class="list-group-item">
+                      <b>Friends</b> <a class="float-right">13,287</a>
+                    </li>
+                  </ul>
+                  
+                  <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
+                  -->
+                </div>
                 
-                <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
-                -->
               </div>
               <!-- /.card-body -->
             </div>

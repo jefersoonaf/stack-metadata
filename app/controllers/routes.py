@@ -47,6 +47,7 @@ cache_app_after_login = []
 @app.route("/index/")
 @login_required
 def index():
+    
     try:
         number_sites = len(database.list("sites"))
     except:
@@ -56,7 +57,21 @@ def index():
         number_learning_objects = len(database.list("learning_objects"))
     except:
         number_learning_objects = 0
-    return render_template("index.html", number_sites=number_sites, number_learning_objects=number_learning_objects)
+    
+    sites = database.list("sites")
+    list_sites = []
+    for site in sites:
+        list_sites.append(site["site"])
+        
+    days_before = datetime.datetime.today()-datetime.timedelta(days=30)
+    date_start = days_before.strftime("%d/%m/%Y")
+    date_end = datetime.datetime.today().strftime("%d/%m/%Y")
+        
+    learning_objects = database.sort("learning_objects", -1, 10)
+    list_learning_objects = []
+    for learning_object in learning_objects:
+        list_learning_objects.append(learning_object)
+    return render_template("index.html", number_sites=number_sites, number_learning_objects=number_learning_objects, sites=list_sites, learning_objects=list_learning_objects, date_start=date_start, date_end=date_end)
 
 #### Pesquisa e Atulização dos sites disponiveis para a busca na api ####
 
@@ -64,6 +79,9 @@ def index():
 @app.route("/search_sites/", methods=['GET'])
 @login_required
 def search_sites():
+    if current_user.role != "administrator":
+        flash('Acesso não permitido a rota especificada!', 'danger')
+        return redirect(url_for("index"))
     sites_database = database.list("sites")
     stackexchange = StackExchange(100, None)
     pages_sites = stackexchange.sites()
@@ -112,14 +130,19 @@ def search_api():
     list_sites = []
     for site in sites:
         list_sites.append(site["site"])
-    return render_template("search_api.html", sites=list_sites)
+        
+    days_before = datetime.datetime.today()-datetime.timedelta(days=30)
+    date_start = days_before.strftime("%d/%m/%Y")
+    date_end = datetime.datetime.today().strftime("%d/%m/%Y")
+    
+    return render_template("search_api.html", sites=list_sites, date_start=date_start, date_end=date_end)
 
 #Apresenta os resultados da pesquisa na api
 @app.route("/results_search_api/", methods=['POST'])
 @login_required
 def results_search_api():   
     global cache_app_after_login
-    if current_user.search_limit <= 0:
+    if current_user.search_limit <= 0 and current_user.role != "administrator":
         flash('Limite diário de buscas na API atingido! Novas buscas na API somente a partir de amanhã!', 'danger')
         return redirect(url_for("index")) 
     stackexchange = StackExchange(PAGE_SIZE, MAX_PAGES)
@@ -128,8 +151,12 @@ def results_search_api():
     list_results = []
     
     #pegar as datas
-    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
-    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    try:
+        date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+        date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    except:
+        date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%m/%d/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+        date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%m/%d/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
     #pegar as ordenações
     selected_sort = request.form.get('selected-sort')
     selected_order = request.form.get('selected-order')
@@ -152,6 +179,10 @@ def results_search_api():
                 if option == site["site"]["api_parameter"]:
                     list_sites_api.append(site["site"])
                     break
+    else:
+        for site in sites:
+            list_sites_api.append(site["site"])
+        
     for site in list_sites_api:
         list_result_items = stackexchange.search_advanced(str(search), str(site["api_parameter"]), date_start, date_end, str(selected_sort), str(selected_order), accepted, selected_tagged, selected_nottagged, str(selected_type_search[0]))
         list_results.append(list_result_items)
@@ -185,8 +216,9 @@ def results_search_api():
         cache_app_after_login.append(cache_user)
      
     #controle do limite de pesquisas diárias na API
-    current_user.search_limit -= 1
-    database.update("users", database.filter_by('users', {"email": current_user.email})[0], current_user.get_as_json())
+    if(current_user.role == "standard"):
+        current_user.search_limit -= 1
+        database.update("users", database.filter_by('users', {"email": current_user.email})[0], current_user.get_as_json())
     
     
     return render_template("results_search_api.html", list_results=cache_user[1], list_sites_api=cache_user[2], update_results=cache_user[3])
@@ -240,24 +272,21 @@ def search_database():
 @login_required
 def results_search_database():
     global cache_app_after_login
-    stackexchange = StackExchange(30, 1)
     sites = database.list("sites")
-    list_sites_api = []
+    list_foruns = []
     list_results = []
     
     #pegar as datas
-    date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
-    date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
-    #pegar as ordenações
-    selected_sort = request.form.get('selected-sort')
+    try:
+        date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+        date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%d/%m/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    except:
+        date_start = datetime.datetime.strptime(request.form.get('date_start')[:10], "%m/%d/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+        date_end = datetime.datetime.strptime(request.form.get('date_end')[:10], "%m/%d/%Y").replace(tzinfo=pytz.utc).timestamp() #para pegar somente a data
+    #pegar o tipo ordenação
     selected_order = request.form.get('selected-order')
-    #pegar as tags e não tags
-    selected_tagged = request.form.get('selected-tagged')
-    selected_nottagged = request.form.get('selected-nottagged')
     #pegar os sites
     selected_sites = request.form.getlist('selected-sites')
-    #pegar seleção de somente perguntas aceitas
-    accepted = request.form.get('accepted')
     #pegar o tipo da busca
     selected_type_search = request.form.getlist('selected-type-search') 
     #pegar a busca
@@ -268,28 +297,15 @@ def results_search_database():
             option = option.split("-")[1]
             for site in sites:
                 if option == site["site"]["api_parameter"]:
-                    list_sites_api.append(site["site"])
+                    list_foruns.append(site["site"])
                     break
-    for site in list_sites_api:
-        list_result_items = database.search_advanced(search, site)
+    else:
+        for site in sites:
+            list_foruns.append(site["site"])
+        
+    for site in list_foruns:
+        list_result_items = database.search_advanced("learning_objects", str(search), str(site["api_parameter"]), date_start, date_end, selected_order, selected_type_search[0])
         list_results.append(list_result_items)
-    
-    print(list_results[1][0])
-    
-    #definir um index $ para especificar se o cache é referente a busca na api ou busca no banco
-    
-    '''
-    update_results = []
-    update = []
-    for results, site in zip(list_results, list_sites_api):
-        for result in results:
-            item_db = database.filter_by('learning_objects', {"general.identifier": result["question_id"]})
-            if item_db:
-                update.append(1)
-            else:
-                update.append(0)
-        update_results.append(update)
-        update = []
     
     cache_user = []
     for x in range(len(cache_app_after_login)):
@@ -297,17 +313,19 @@ def results_search_database():
             cache_user = cache_app_after_login[x]
             break        
     if cache_user:
-        cache_user[1] = list_results
-        cache_user[2] = list_sites_api
-        cache_user[3] = update_results
+        cache_user[4] = list_results
+        cache_user[5] = list_foruns
     else:
         cache_user.append(current_user.email)
+        cache_user.append(None)
+        cache_user.append(None)
+        cache_user.append(None)
         cache_user.append(list_results)
-        cache_user.append(list_sites_api)
-        cache_user.append(update_results)
+        cache_user.append(list_foruns)
         cache_app_after_login.append(cache_user)
-    '''
-    return render_template("search_database.html")
+
+    return render_template("results_search_database.html", list_results=cache_user[4], list_foruns=cache_user[5])
+
 
 #Visualiza os objetos de aprendizagens que estão no banco de dados
 @app.route("/view_learning_objects/")
@@ -354,6 +372,152 @@ def delete_learning_object(id_learning_object_0, id_learning_object_1):
 
 
 #### Login, Registro, Perfil, Logout e Recuperação de senha ####
+
+#Visualiza todos os usuários cadastrados
+@app.route("/view_users/")
+@login_required
+def view_users():
+    if current_user.role != "administrator":
+        flash('Acesso negado!', 'danger')
+        return redirect(url_for("index"))
+     
+    users = database.list("users")
+    return render_template("view_users.html", users=users)
+
+#Visualiza todos os usuários cadastrados
+@app.route("/request_admin_access/")
+@login_required
+def request_admin_access():
+    msg = Message('Solicitação de acesso como administrador!')
+    msg.html = f"""  
+            <div width="100%" style="margin:0;padding:0!important">
+                <center style="width:100%;>
+                    <div style="max-width:600px;margin:0 auto" class="m_-2585479850499807075email-container">
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                            <tbody>
+                                <tr>
+                                    <td height="20"></td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <p style="line-height:1.5;font-family:'Lato',Calibri,Arial,sans-serif;font-size:18px;color:#000000;text-align:center;text-decoration:none"> 
+                                            O usuário abaixo solicitou acesso como administrador:
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table style="border:1px solid #9400D3;margin-top:10px" border="0" width="200" cellspacing="0" cellpadding="0" align="center">
+                            <tbody>
+                                <tr>
+                                    <td height="60">
+                                        <p style="font-family:'Lato',Calibri,Arial,sans-serif;font-size:22px;color:#9400D3;text-align:center">
+                                            <strong>
+                                                {current_user.email}
+                                            </strong>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                            <tbody>
+                                <tr>
+                                    <td height="20"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </center>
+                <div class="yj6qo"></div>
+                <div class="adL"></div>
+            </div>
+        """        
+    
+    error = 0
+    success = 0
+    
+    users = database.filter_by("users", {"role": "administrator"})
+    for user in users:    
+        print(user)
+        #envio do email com o código
+        msg.recipients = [user['email']]        
+        try:                    
+            mail.send(msg)
+            success += 1
+        except:
+            error += 1
+    
+    if error > 0:
+        flash(f"Ocorreu um problema ao tentar enviar a solicitação para os administradores! {success} emails foram enviados e {error} não foram enviados", 'info')
+    else:
+        flash('Solicitação enviada para todos os administradores!', 'primary')
+                                
+    return redirect(url_for("profile"))
+
+#Libera o acesso de administrator
+@app.route("/release_admin_access/<string:email>/")
+@login_required
+def release_admin_access(email):
+    if current_user.role != "administrator":
+        flash('Acesso negado!', 'danger')
+        return redirect(url_for("index"))
+     
+    user_bd = database.filter_by("users", {"email": email})
+    if user_bd:
+        user_aux = user_bd[0]
+        user_aux['role'] = "administrator"
+        user_aux['search_limit'] = 99999
+        
+        database.update("users", user_bd[0], user_aux)
+        
+        flash('Usuário liberado para acesso como administrador!', 'success')
+    
+    flash('Ocorrreu um problema ao tentar liberar o usuário para acesso como administrador!', 'danger')
+    
+    users = database.list("users")
+    return render_template("view_users.html", users=users)
+
+#Remove o acesso de administrator
+@app.route("/remove_admin_access/<string:email>/")
+@login_required
+def remove_admin_access(email):
+    if current_user.role != "administrator":
+        flash('Acesso negado!', 'danger')
+        return redirect(url_for("index"))
+
+    user_bd = database.filter_by("users", {"email": email})
+    if user_bd:
+        user_aux = user_bd[0]
+        user_aux['role'] = "standard"
+        user_aux['search_limit'] = 20
+        
+        database.update("users", user_bd[0], user_aux)
+        
+        flash('Acesso como administrador removido do usuário!', 'success')
+    
+    flash('Ocorrreu um problema ao tentar remover o acesso como administrador do usuário !', 'danger')
+    
+    users = database.list("users")
+    return render_template("view_users.html", users=users)
+
+#Deleta o usuário
+@app.route("/delete_user/<string:email>/")
+@login_required
+def delete_user(email):
+    if current_user.role != "administrator":
+        flash('Acesso negado!', 'danger')
+        return redirect(url_for("index"))
+    
+    user_bd = database.filter_by("users", {"email": email})
+    if user_bd:
+        database.delete("users", user_bd[0])
+        
+    users = database.list("users")
+    
+    flash('Usuário deletado com sucesso!', 'success')
+    
+    return render_template("view_users.html", users=users)
 
 #Registro de conta
 @app.route("/register/", methods=['GET', 'POST'])

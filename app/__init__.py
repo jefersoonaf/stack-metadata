@@ -3,7 +3,6 @@ from app.models.database import Database
 from flask_login import LoginManager
 from flask_mail import Mail
 from apscheduler.schedulers.background import BackgroundScheduler
-#import atexit
 import pytz
 import logging
 import datetime
@@ -19,20 +18,14 @@ SEARCH_LIMIT = 20
 
 database = Database(DATABASE)
 
-#aegndador de tarefas
+#agendador de tarefas
 def job_function():
     list_users_db = database.filter_by("users", {"role": "standard"})
     for user in list_users_db:
         user_temp = user
         user['search_limit'] = SEARCH_LIMIT
         database.update("users", user_temp, user)
-        
-    now = datetime.datetime.now().minute
-    minute_next_job = now + 2
-    scheduler.reschedule_job('1', trigger='cron', hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute+1)
-    '''print("#################################")
-    scheduler.print_jobs()
-    print("#################################")'''
+    scheduler.reschedule_job('1', trigger='cron', hour=00, minute=00, second=10)
 
 job_defaults = {
     'coalesce': False,
@@ -40,7 +33,7 @@ job_defaults = {
 }
 
 scheduler = BackgroundScheduler(job_defaults=job_defaults, timezone=pytz.timezone('America/Sao_Paulo'))
-scheduler.add_job(job_function, 'cron', hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute+1, id="1")
+scheduler.add_job(job_function, 'cron', hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute, second=datetime.datetime.now().second+10, id="1")
 scheduler.start()
 logging.basicConfig()
 logging.getLogger('apscheduler').setLevel(logging.DEBUG)
@@ -61,7 +54,6 @@ app.config.update(
     MAIL_PASSWORD = PASSWORD_EMAIL
 )
 
-#atexit.register(lambda: scheduler.shutdown(wait=False))
 mail = Mail(app)
 login_manager = LoginManager()
 login_manager.init_app(app)

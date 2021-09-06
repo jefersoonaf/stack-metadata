@@ -43,6 +43,7 @@
                   <thead>
                   <tr>
                     <th>Ação</th>
+                    <th>Fórum</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>
@@ -51,18 +52,27 @@
                   <tbody>
                     {% for result_for_site in list_results %}
                       {% for result in result_for_site %}
-                        <tr>
-                          <td>
-                            <a href="{{ url_for('create_learning_object/') }}" class="btn btn-secondary btn-icon-split">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-arrow-right"></i>
-                              </span>
-                              <span class="text">Visualizar</span>
-                            </a>
-                          </td>
-                          <td>{{ result['title'] | safe }}</td>
-                          <td>{{ result['tags'] | safe }}</td>
-                          <td><a href="{{ result['link'] }}" target="_blank">{{ result['link'] }}</a></td>
+                        <tr>                          
+                          <td class="btn-group">
+                            {% if current_user.role == "administrator" %}
+                              <a href="#" class="btn btn-secondary btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-sync-alt"></i>
+                                </span>
+                                <span class="text">Atualizar</span>
+                              </a>
+                            {% endif %}
+                              <a href="{{ url_for('view_learning_object', id_learning_object_0=result['general']['identifier'][0],id_learning_object_1=result['general']['identifier'][1]) }}" class="btn btn-info btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                                <span class="text">Visualizar</span>
+                              </a>
+                          </td>   
+                          <td>{{ result['general']['identifier'][0] | safe }}</td>                       
+                          <td>{{ result['general']['title'] | safe }}</td>
+                          <td>{{ result['general']['catalog_entry']['catalogue'] | safe }}</td>
+                          <td><a href="{{ result['general']['catalog_entry']['entry'] }}" target="_blank">{{ result['general']['catalog_entry']['entry'] }}</a></td>
                         </tr>
                       {% endfor %}
                     {% endfor %}
@@ -70,6 +80,7 @@
                   <tfoot>
                   <tr>
                     <th>Ação</th>
+                    <th>Fórum</th>
                     <th>Título</th>
                     <th>Tags</th>
                     <th>URL</th>

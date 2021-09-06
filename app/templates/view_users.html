@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} StackMetadata | Objetos de Aprendizagem {% endblock title %}
+{% block title %} StackMetadata | Usuários {% endblock title %}
 {% block head %}
   {{ super() }}
   <!-- DataTables -->
@@ -15,12 +15,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Objetos de Aprendizagem</h1>
+          <h1>Usuários</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="breadcrumb-item active">Objetos de Aprendizagem</li>
+            <li class="breadcrumb-item active">Usuários</li>
           </ol>
         </div>
       </div>
@@ -34,57 +34,91 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Objetos de Aprendizagem armazenados no Banco de Dados</h3>
+              <h3 class="card-title">Usuários cadastrados no sistema</h3>
             </div>
             <!-- /.card-header -->
-            {% if learning_objects %}
+            {% if users %}
               <div class="card-body">
                 <table id="data-table" class="table table-bordered table-striped">
                   <thead>
                   <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Limite de pesquisa na API</th>
                     <th>Ação</th>
-                    <th>Título</th>
-                    <th>Tags</th>
-                    <th>URL</th>
                   </tr>
                   </thead>
                   <tbody>
-                    {% for learning_object in learning_objects %}
-                      <tr>
-                        <td class="btn-group">
-                          <a href="{{ url_for('view_learning_object', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" class="btn btn-info btn-icon-split">
-                            <span class="icon text-white-50">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                            <span class="text">Visualizar</span>
-                          </a>
-                          {% if current_user.role == "administrator" %}
-                            <a href="{{ url_for('edit_learning_object', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" class="btn btn-warning btn-icon-split">
+                    {% for user in users %}
+                      <tr>                        
+                        <td>{{ user['name'] | safe }}</td>
+                        <td>{{ user['email'] | safe }}</td>
+                        <td>{{ user['search_limit'] | safe }}</td>  
+                        <td>   
+                          {% if user['role'] == "administrator" %}                       
+                            <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split disabled">
                               <span class="icon text-white-50">
-                                  <i class="fas fa-edit"></i>
+                                  <i class="fas fa-user-check"></i>
                               </span>
-                              <span class="text">Editar</span>
+                              <span class="text">Liberar Acesso de Administrador</span>
                             </a>
-                            <a href="{{ url_for('delete_learning_object', id_learning_object_0=learning_object['general']['identifier'][0],id_learning_object_1=learning_object['general']['identifier'][1]) }}" class="btn btn-danger btn-icon-split">
+                            {% if user['email'] == "jefersonpks@gmail.com" %}
+                              <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split disabled">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-alt-slash"></i>
+                                </span>
+                                <span class="text">Remover Acesso de Administrador</span>
+                              </a>                            
+                              <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split disabled">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-times"></i>
+                                </span>
+                                <span class="text">Deletar</span>
+                              </a>
+                            {% else %}
+                              <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-alt-slash"></i>
+                                </span>
+                                <span class="text">Remover Acesso de Administrador</span>
+                              </a>  
+                              <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-times"></i>
+                                </span>
+                                <span class="text">Deletar</span>
+                              </a>
+                            {% endif %}
+                          {% else %}
+                            <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split">
                               <span class="icon text-white-50">
-                                  <i class="fas fa-trash-alt"></i>
+                                  <i class="fas fa-user-check"></i>
+                              </span>
+                              <span class="text">Liberar Acesso de Administrador</span>
+                            </a>
+                            <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split disabled">
+                              <span class="icon text-white-50">
+                                  <i class="fas fa-user-alt-slash"></i>
+                              </span>
+                              <span class="text">Remover Acesso de Administrador</span>
+                            </a>
+                            <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split">
+                              <span class="icon text-white-50">
+                                  <i class="fas fa-user-times"></i>
                               </span>
                               <span class="text">Deletar</span>
                             </a>
                           {% endif %}
-                        </td>
-                        <td>{{ learning_object['general']['title'] | safe }}</td>
-                        <td>{{ learning_object['general']['catalog_entry']['catalogue'] | safe }}</td>
-                        <td><a href="{{ learning_object['general']['catalog_entry']['entry'] }}" target="_blank">{{ learning_object['general']['catalog_entry']['entry'] }}</a></td>
+                        </td>                      
                       </tr>
                     {% endfor %}
                   </tbody>
                   <tfoot>
                   <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Limite de pesquisa na API</th>
                     <th>Ação</th>
-                    <th>Título</th>
-                    <th>Tags</th>
-                    <th>URL</th>
                   </tr>
                   </tfoot>
                 </table>
