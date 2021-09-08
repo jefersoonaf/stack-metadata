@@ -38,7 +38,7 @@
             <h1>
               <i class="fas fa-edit"></i>
               Edição: 
-              <a href="{{ learning_object['general']['catalog_entry']['entry'] }}" target="_blank">{{ learning_object['general']['identifier'][0] | safe | capitalize }} - {{ learning_object['general']['identifier'][1] | safe }}</a>
+              <a href="{{ learning_object['general']['catalog_entry']['entry'] }}" target="_blank">{{ learning_object['general']['identifier'][0] | safe }} - {{ learning_object['general']['identifier'][1] | safe }}</a>
             </h1>
           </div>
           <div class="col-sm-6">
@@ -101,7 +101,7 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input readonly class="form-control" name="general[identifier][0]" data-value-type="string" type="text" value="{{ learning_object['general']['identifier'][0] | safe | capitalize }}">
+                                              <input readonly class="form-control" name="general[identifier][0]" data-value-type="string" type="text" value="{{ learning_object['general']['identifier'][0] | safe }}">
                                             </td>
                                           </tr>
                                           <tr>
@@ -627,12 +627,12 @@
                                         <tbody>
                                           <tr>
                                             <td>
-                                              <input readonly class="form-control" name="meta_metadata[identifier][0]" data-value-type="string" type="text" value="{{ learning_object['meta_metadata']['identifier'][0] | safe | capitalize }}">
+                                              <input readonly class="form-control" name="meta_metadata[identifier][0]" data-value-type="string" type="text" value="{{ learning_object['meta_metadata']['identifier'][0] | safe }}">
                                             </td>
                                           </tr>
                                           <tr>
                                             <td>
-                                              <input readonly class="form-control" name="meta_metadata[identifier][1]" data-value-type="number" type="text" value="{{ learning_object['meta_metadata']['identifier'][1] | safe | capitalize }}">
+                                              <input readonly class="form-control" name="meta_metadata[identifier][1]" data-value-type="number" type="text" value="{{ learning_object['meta_metadata']['identifier'][1] | safe }}">
                                             </td>
                                           </tr>
                                         </tbody>

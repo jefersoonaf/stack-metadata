@@ -41,6 +41,9 @@ class Database(object):
     def update(self, collection_name, db_instance, instance):
         instance = dict(instance)
         self.database[str(collection_name)].update_one({"_id": db_instance["_id"]}, {"$set": instance})
+    
+    def update_all(self, collection_name, field, where, update):
+        self.database[str(collection_name)].update_many({f"{field}": where}, {"$set": {f"{field}": update}})
 
     def delete(self, collection_name, instance):
         self.database[str(collection_name)].delete_one({"_id": instance["_id"]})

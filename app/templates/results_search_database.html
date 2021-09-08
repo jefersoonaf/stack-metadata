@@ -61,13 +61,32 @@
                                 </span>
                                 <span class="text">Atualizar</span>
                               </a>
-                            {% endif %}
                               <a href="{{ url_for('view_learning_object', id_learning_object_0=result['general']['identifier'][0],id_learning_object_1=result['general']['identifier'][1]) }}" class="btn btn-info btn-icon-split">
                                 <span class="icon text-white-50">
                                     <i class="fas fa-eye"></i>
                                 </span>
                                 <span class="text">Visualizar</span>
                               </a>
+                              <a href="{{ url_for('edit_learning_object', id_learning_object_0=result['general']['identifier'][0],id_learning_object_1=result['general']['identifier'][1]) }}" class="btn btn-warning btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                                <span class="text">Editar</span>
+                              </a>
+                              <a href="{{ url_for('delete_learning_object', id_learning_object_0=result['general']['identifier'][0],id_learning_object_1=result['general']['identifier'][1]) }}" class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                                <span class="text">Deletar</span>
+                              </a>
+                            {% else %}
+                              <a href="{{ url_for('view_learning_object', id_learning_object_0=result['general']['identifier'][0],id_learning_object_1=result['general']['identifier'][1]) }}" class="btn btn-info btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                                <span class="text">Visualizar</span>
+                              </a>
+                            {% endif%}
                           </td>   
                           <td>{{ result['general']['identifier'][0] | safe }}</td>                       
                           <td>{{ result['general']['title'] | safe }}</td>

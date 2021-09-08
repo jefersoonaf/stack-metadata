@@ -1,6 +1,5 @@
-from flask import Flask, request
-from pymongo import MongoClient
-
+import langid
+import pycountry
 class LearningObject():
     def __init__(self, learning_object_item, name_site, api_site):
         try:
@@ -11,7 +10,7 @@ class LearningObject():
                     "catalogue": learning_object_item["tags"],
                     "entry": learning_object_item["link"]
                 },
-                "language": None,
+                "language": self.language_detector(learning_object_item["title"]),
                 "description":{
                     "question": learning_object_item["body"],
                     "answers": learning_object_item["answers"]  
@@ -29,7 +28,7 @@ class LearningObject():
                     "catalogue": learning_object_item["tags"],
                     "entry": learning_object_item["link"]
                 },
-                "language": None,
+                "language": self.language_detector(learning_object_item["title"]),
                 "description":{
                     "question": learning_object_item["body"],
                     "answers": [] 
@@ -72,7 +71,7 @@ class LearningObject():
                     "date": learning_object_item["creation_date"]
                 },
                 "metadata_scheme": "IEEE LOM",
-                "language": None
+                "language": self.general['language']
             }
         except:
             self.meta_metadata = {
@@ -87,7 +86,7 @@ class LearningObject():
                     "date": learning_object_item["creation_date"]
                 },
                 "metadata_scheme": "IEEE LOM",
-                "language": None
+                "language": self.general['language']
             }
         self.technical = {
             "format": "text/html",
@@ -114,7 +113,7 @@ class LearningObject():
             "difficulty": "Fácil",
             "typical_learning_time": None,
             "description": None,
-            "language": None
+            "language": self.general['language']
         }
         self.rights = {
             "cost": "Não",
@@ -166,6 +165,11 @@ class LearningObject():
                 },
                 "keywords": learning_object_item["tags"]
             }
+
+    def language_detector(self, text):
+        lang_detect = langid.classify(text)
+        lang_name = pycountry.languages.get(alpha_2=lang_detect[0]).name 
+        return lang_name
 
     def get_as_json(self):
         return self.__dict__

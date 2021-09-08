@@ -55,33 +55,54 @@
                         <td>{{ user['email'] | safe }}</td>
                         <td>{{ user['search_limit'] | safe }}</td>  
                         <td>   
-                          {% if user['role'] == "administrator" %}                       
-                            <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split disabled">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-user-check"></i>
-                              </span>
-                              <span class="text">Liberar Acesso de Administrador</span>
-                            </a>
-                            {% if user['email'] == "jefersonpks@gmail.com" %}
+                          <div class="btn-group">
+                            {% if user['role'] == "administrator" %}                       
+                              <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split disabled">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-check"></i>
+                                </span>
+                                <span class="text">Liberar Acesso de Administrador</span>
+                              </a>
+                              {% if user['email'] == "jefersonpks@gmail.com" %}
+                                <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split disabled">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-user-alt-slash"></i>
+                                  </span>
+                                  <span class="text">Remover Acesso de Administrador</span>
+                                </a>                            
+                                <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split disabled">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-user-times"></i>
+                                  </span>
+                                  <span class="text">Deletar</span>
+                                </a>
+                              {% else %}
+                                <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-user-alt-slash"></i>
+                                  </span>
+                                  <span class="text">Remover Acesso de Administrador</span>
+                                </a>  
+                                <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split">
+                                  <span class="icon text-white-50">
+                                      <i class="fas fa-user-times"></i>
+                                  </span>
+                                  <span class="text">Deletar</span>
+                                </a>
+                              {% endif %}
+                            {% else %}
+                              <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-user-check"></i>
+                                </span>
+                                <span class="text">Liberar Acesso de Administrador</span>
+                              </a>
                               <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split disabled">
                                 <span class="icon text-white-50">
                                     <i class="fas fa-user-alt-slash"></i>
                                 </span>
                                 <span class="text">Remover Acesso de Administrador</span>
-                              </a>                            
-                              <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split disabled">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-user-times"></i>
-                                </span>
-                                <span class="text">Deletar</span>
                               </a>
-                            {% else %}
-                              <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-user-alt-slash"></i>
-                                </span>
-                                <span class="text">Remover Acesso de Administrador</span>
-                              </a>  
                               <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split">
                                 <span class="icon text-white-50">
                                     <i class="fas fa-user-times"></i>
@@ -89,26 +110,7 @@
                                 <span class="text">Deletar</span>
                               </a>
                             {% endif %}
-                          {% else %}
-                            <a href="{{ url_for('release_admin_access', email=user['email']) }}" class="btn btn-warning btn-icon-split">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-user-check"></i>
-                              </span>
-                              <span class="text">Liberar Acesso de Administrador</span>
-                            </a>
-                            <a href="{{ url_for('remove_admin_access', email=user['email']) }}" class="btn btn-dark btn-icon-split disabled">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-user-alt-slash"></i>
-                              </span>
-                              <span class="text">Remover Acesso de Administrador</span>
-                            </a>
-                            <a href="{{ url_for('delete_user', email=user['email']) }}" class="btn btn-danger btn-icon-split">
-                              <span class="icon text-white-50">
-                                  <i class="fas fa-user-times"></i>
-                              </span>
-                              <span class="text">Deletar</span>
-                            </a>
-                          {% endif %}
+                          </div>
                         </td>                      
                       </tr>
                     {% endfor %}

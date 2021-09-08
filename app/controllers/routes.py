@@ -46,18 +46,7 @@ cache_app_after_login = []
 @app.route("/")
 @app.route("/index/")
 @login_required
-def index():
-    
-    try:
-        number_sites = len(database.list("sites"))
-    except:
-        number_sites = 0
-        
-    try:
-        number_learning_objects = len(database.list("learning_objects"))
-    except:
-        number_learning_objects = 0
-    
+def index():   
     sites = database.list("sites")
     list_sites = []
     for site in sites:
@@ -71,7 +60,43 @@ def index():
     list_learning_objects = []
     for learning_object in learning_objects:
         list_learning_objects.append(learning_object)
-    return render_template("index.html", number_sites=number_sites, number_learning_objects=number_learning_objects, sites=list_sites, learning_objects=list_learning_objects, date_start=date_start, date_end=date_end)
+    return render_template("index.html", sites=list_sites, learning_objects=list_learning_objects, date_start=date_start, date_end=date_end)
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    try:
+        number_sites = len(database.list("sites"))
+    except:
+        number_sites = 0
+        
+    try:
+        number_learning_objects = len(database.list("learning_objects"))
+    except:
+        number_learning_objects = 0
+    
+    sites = database.list("sites")    
+    list_names_objets_for_sites = []
+    list_numbers_objets_for_sites = []
+    list_colors = []
+    
+    try:
+        for site in sites:
+            objects_for_sites = database.filter_by("learning_objects", {"classification.taxon_path.source": str(site["site"]["name"])})
+            if objects_for_sites:
+                list_names_objets_for_sites.append(objects_for_sites[0]['classification']['taxon_path']['source'])
+                list_numbers_objets_for_sites.append(len(objects_for_sites))        
+        x = 0
+        while x < len(list_names_objets_for_sites):
+            r = lambda: random.randint(0,255)
+            list_colors.append('#%02X%02X%02X' % (r(),r(),r()))
+            x += 1
+    except:
+        list_names_objets_for_sites.append("Nenhum")
+        list_numbers_objets_for_sites.append(0)
+        list_colors.append('#000000')
+        
+    return render_template("dashboard.html", number_sites=number_sites, number_learning_objects=number_learning_objects, list_names_objets_for_sites=list_names_objets_for_sites, list_numbers_objets_for_sites=list_numbers_objets_for_sites, list_colors=list_colors)
 
 #### Pesquisa e Atulização dos sites disponiveis para a busca na api ####
 
@@ -93,7 +118,7 @@ def search_sites():
                 for site_database in sites_database:
                     if site_json["site"]["api_parameter"] == site_database["site"]["api_parameter"]:
                         #site_update = {**site_database, **site_json}
-                        site_update = site_json
+                        site_update = site_json      
                         database.update("sites", site_database, site_update)       
                         break
                 if site_update == None or "":
@@ -312,7 +337,7 @@ def results_search_database():
         if current_user.email == cache_app_after_login[x][0]:              
             cache_user = cache_app_after_login[x]
             break        
-    if cache_user:
+    if cache_user and cache_user[4] != None:
         cache_user[4] = list_results
         cache_user[5] = list_foruns
     else:
@@ -350,6 +375,28 @@ def view_learning_object(id_learning_object_0, id_learning_object_1):
 def edit_learning_object(id_learning_object_0, id_learning_object_1):
     learning_object = database.filter_by('learning_objects', {"general.identifier": id_learning_object_0,"general.identifier": id_learning_object_1})
     return render_template("edit_learning_object.html", learning_object=learning_object[0])
+
+#Edição avançada de objetos de aprendizagem
+@app.route("/edit_advanced_learning_objects/", methods=['GET', 'POST'])
+@login_required
+def edit_advanced_learning_objects():
+    return render_template("edit_advanced_learning_objects.html")
+
+@app.route("/update_advanced_learning_objects/", methods=['GET', 'POST'])
+@login_required
+def update_advanced_learning_objects():
+    selected_fields = request.form.getlist('selected-fields')
+    update_field = request.form.get('update-field')
+    where_field = request.form.get('where-field')
+       
+    try:
+        for field in selected_fields:
+            database.update_all("learning_objects", str(field), where_field, update_field)
+        flash('Alteração realizada com sucesso!', 'success')
+        return render_template("edit_advanced_learning_objects.html")
+    except:
+        flash('Ocorreu um problema ao executar a alteração, verifique o campo!', 'primary')
+        return render_template("edit_advanced_learning_objects.html")
 
 #Atualiza o objeto de aprendizagem que foi editado
 @app.route("/update_learning_object/<string:id_learning_object_0>/<int:id_learning_object_1>", methods=['GET', 'POST'])

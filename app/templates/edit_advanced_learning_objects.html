@@ -1,0 +1,135 @@
+{% extends 'layout.html' %}
+{% block title %} StackMetadata | Edição Avançada de Objetos de Aprendizagem {% endblock title %}
+{% block head %}
+  {{ super() }}
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/select2/css/select2.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+{% endblock head %}
+{% block section_content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header border-bottom">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Edição Avançada de Objetos de Aprendizagem</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active">Edição Avançada de Objetos de Aprendizagem</li>
+              </ol>
+            </div>
+          </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <form class="form-horizontal" action="{{ url_for('update_advanced_learning_objects') }}" method="post">
+          <div class="row mt-5">
+            <div class="col-md-10 offset-md-1">                                      
+              <div class="row">
+                <div class="col-12 form-group">
+                  <div class="input-group">
+                    <label class="col-sm-2 col-form-label">Campo:</label>
+                    <select name="selected-fields" class="form-control select2" multiple="multiple" data-placeholder="Nenhum" required>
+                      <option>general.title</option>
+                      <option>general.catalog_entry.catalogue</option>
+                      <option>general.catalog_entry.entry</option>
+                      <option>general.language</option>
+                      <option>general.description.question</option>
+                      <option>general.description.answers</option>
+                      <option>general.keywords</option>
+                      <option>general.coverage</option>
+                      <option>general.structure</option>
+                      <option>general.aggregation_level</option>
+                      <option>meta_metadata.language</option>
+                      <option>educational.language</option>
+                      <option>classification.taxon_path.source</option>
+                    </select>                                                  
+                  </div>      
+                  <label class="col-sm-2 col-form-label"></label>              
+                  <small id="passwordHelpInline" class="text-muted">
+                    Exemplo: genenal.title, general.language, meta_metadata.catalog.catalog, e etc
+                  </small>   
+                </div>
+              </div>                                                
+              <div class="row">
+                <div class="col-12 form-group">
+                  <div class="input-group">
+                    <label class="col-sm-2 col-form-label">Alterar para:</label>
+                    <input name="update-field" type="search" class="form-control" placeholder="Digite para qual valor deseja alterar o campo" aria-label="Search" required>                    
+                  </div>
+                </div>
+              </div>                                                
+              <div class="row">
+                <div class="col-12 form-group">
+                  <div class="input-group">
+                    <label class="col-sm-2 col-form-label">Quando for igual à:</label>
+                    <input name="where-field" type="search" class="form-control" placeholder="Digite a condição para quando o campo deve ser alterado" aria-label="Search" required>                    
+                  </div>
+                </div>
+              </div> 
+              <button style="float: right;" class="btn-lg btn-success mb-4" type="submit">
+                <span class="icon text-white-50">
+                  <i class="fas fa-check"></i>
+                </span>
+                <span class="text">Confirmar alteração</span>
+              </button>                                          
+            </div>            
+          </div>          
+        </form>
+      </div>
+    </section>
+  </div>
+{% endblock section_content %}
+{% block scripts %}
+  {{ super() }}
+    <!-- Select2 -->
+    <script src="{{ url_for('static', filename='plugins/select2/js/select2.full.min.js') }}"></script>
+    <!-- InputMask -->
+    <script src="{{ url_for('static', filename='plugins/moment/moment-with-locales.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+    <script>
+      $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Create tags in select2
+        $(".create-tags").select2({
+          tags: true,
+          tokenSeparators: [',', ';', '.']
+        });
+        //Date picker
+        $('#reservationdate_start').datetimepicker({
+          locale: 'pt-br',
+          format: 'DD/MM/YYYY'
+        });
+        $('#reservationdate_end').datetimepicker({
+          useCurrent: false,
+          locale: 'pt-br',
+          format: 'L'
+        });
+        //Linked Date picker
+        $("#reservationdate_start").on("change.datetimepicker", function (e) {
+            $('#reservationdate_end').datetimepicker('minDate', e.date);
+        });
+        $("#reservationdate_end").on("change.datetimepicker", function (e) {
+            $('#reservationdate_start').datetimepicker('maxDate', e.date);
+        });
+      });
+    </script>
+{% endblock scripts %}

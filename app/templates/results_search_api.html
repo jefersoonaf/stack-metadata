@@ -57,7 +57,7 @@
                         <tr>
                           <td>{{ list_sites_api[index_list_results]['name'] | safe }}</td>
                           <td class="btn-group">
-                            {% if current_user == "administrator" %}
+                            {% if current_user.role == "administrator" %}
                               {% if update_results[index_list_results][index_result] == 1 %}
                                 <a href="{{ url_for('create_learning_object', index_list_results=index_list_results, index_result=index_result, name_site=list_sites_api[index_list_results]['name'], api_site=list_sites_api[index_list_results]['api_parameter']) }}" class="btn btn-secondary btn-icon-split">
                                   <span class="icon text-white-50">
