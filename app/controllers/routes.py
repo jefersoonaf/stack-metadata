@@ -271,6 +271,7 @@ def create_learning_object(index_list_results, index_result, name_site, api_site
     #verificar se já esta no banco de dados e impedir de incluir novamente
     learning_object = LearningObject(save_item, name_site, api_site)
     learning_object_json = learning_object.get_as_json()
+    print(learning_object_json)
     item_db = database.filter_by('learning_objects', {"general.identifier": learning_object_json['general']['identifier'][1]})
     if not item_db:
         database.create("learning_objects", learning_object)

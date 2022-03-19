@@ -1631,7 +1631,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="relation[identifier]" data-value-type="string" type="text" value="{{ learning_object['relation']['identifier'] | safe }}">
+                                                        <input class="form-control" name="relation[identifier]" data-value-type="string" type="text" value="{{ learning_object['relation']['resource']['identifier'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1654,7 +1654,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="relation[description]" data-value-type="string" type="text" value="{{ learning_object['relation']['description'] | safe }}">
+                                                        <input class="form-control" name="relation[description]" data-value-type="string" type="text" value="{{ learning_object['relation']['resource']['description'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
@@ -1677,7 +1677,7 @@
                                                   <tbody>
                                                     <tr>
                                                       <td>
-                                                        <input class="form-control" name="relation[catalog_entry]" data-value-type="string" type="text" value="{{ learning_object['relation']['catalog_entry'] | safe }}">
+                                                        <input class="form-control" name="relation[catalog_entry]" data-value-type="string" type="text" value="{{ learning_object['relation']['resource']['catalog_entry'] | safe }}">
                                                       </td>
                                                     </tr>
                                                   </tbody>
